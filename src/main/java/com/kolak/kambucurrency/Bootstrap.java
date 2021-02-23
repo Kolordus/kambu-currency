@@ -26,6 +26,7 @@ public class Bootstrap {
             Currency currency4 = new Currency("JPY");
             Currency currency5 = new Currency("ISK");
             Currency currency6 = new Currency("HUF");
+            Currency currency7 = new Currency("PLN");
 
             currencyRepository.save(currency);
             currencyRepository.save(currency1);
@@ -34,6 +35,7 @@ public class Bootstrap {
             currencyRepository.save(currency4);
             currencyRepository.save(currency5);
             currencyRepository.save(currency6);
+            currencyRepository.save(currency7);
         }
     }
 }

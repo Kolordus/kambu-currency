@@ -1,6 +1,7 @@
 package com.kolak.kambucurrency.service;
 
 
+import com.kolak.kambucurrency.exception.CurrencyNotSupportedException;
 import com.kolak.kambucurrency.model.Currency;
 import com.kolak.kambucurrency.model.nbpapi.CurrencyDetails;
 
@@ -9,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.DecimalFormat;
@@ -61,6 +61,10 @@ public class CurrencyService {
 
         double baseRate = getPlnRate(base);
 
+        if (currenciesList.isEmpty()) {
+            return getCurrencyRating(baseRate, rates);
+        }
+
         for (String currency : currenciesList) {
             rates.put(currency.toUpperCase(),
                     formatDouble(baseRate / getPlnRate(currency)));
@@ -81,10 +85,16 @@ public class CurrencyService {
         return rates;
     }
 
+    public Map<String, Double> getCurrencyRating(double baseRate, Map<String, Double> rates) {
+        for (Currency currency : currencyRepository.findAll()) {
+            rates.put(currency.getCode(), formatDouble(baseRate / getPlnRate(currency.getCode())));
+        }
+        return rates;
+    }
+
     public Map<String, Double> getCurrencyRating(Map<String, Double> rates) {
         for (Currency currency : currencyRepository.findAll()) {
             rates.put(currency.getCode().toUpperCase(), getPlnRate(currency.getCode()));
-
         }
 
         return rates;
@@ -92,20 +102,20 @@ public class CurrencyService {
 
 
     public double getPlnRate(String base) {
-        if (base.toUpperCase().equals("PLN")) {
-            return 1d;
+        if (currencyRepository.findAll().stream().noneMatch(currency -> currency.getCode().equals(base.toUpperCase()))) {
+            throw new CurrencyNotSupportedException(base);
         }
-        CurrencyDetails currencyDetails;
-        double baseCurrencyMidRate = 0;
-        try {
-            currencyDetails = restTemplate.getForObject(CURRENCY_API_URL + base + JSON_FORMAT, CurrencyDetails.class);
 
-            if (currencyDetails != null)
-                baseCurrencyMidRate = currencyDetails.getRates().get(MEDIUM_RATE).getMid();
-        } catch (HttpClientErrorException e) {
-//            throw new RuntimeException("bad base!");
-            // todo proper error
+        if (base.toUpperCase().equals("PLN")) {
+            return 1.0d;
         }
+
+        CurrencyDetails currencyDetails = restTemplate.getForObject(CURRENCY_API_URL + base + JSON_FORMAT, CurrencyDetails.class);
+        double baseCurrencyMidRate = 0d;
+
+        if (currencyDetails != null)
+            return currencyDetails.getRates().get(MEDIUM_RATE).getMid();
+
         return baseCurrencyMidRate;
     }
 
