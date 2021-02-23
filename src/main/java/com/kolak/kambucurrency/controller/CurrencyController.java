@@ -1,10 +1,13 @@
 package com.kolak.kambucurrency.controller;
 
 
+import com.kolak.kambucurrency.model.Currency;
 import com.kolak.kambucurrency.service.CurrencyService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -17,19 +20,21 @@ public class CurrencyController {
         this.currencyService = currencyService;
     }
 
-    @GetMapping("/test")
-    public String method() {
-        return "test endpoint";
+    @GetMapping("/get-all-available")
+    public ResponseEntity<List<String>> getAllAvailableCurrencies() {
+        return ResponseEntity.ok(currencyService.getAllAvailableCurrencies());
     }
 
-    @PostMapping("/post-test")
-    public void postTest(@RequestParam String elo) {
-        System.out.println(elo);
+    @GetMapping("/convert")
+    public double convertCurrency(@RequestParam Double amount, @RequestParam String base, @RequestParam String desired) {
+        return currencyService.convert(amount, base, desired);
     }
 
     @GetMapping("/get-rating")
-    public Map<String, Double> getCurrencyRating(@RequestParam String[] params) {
-        Map<String, Double> currencyRating = currencyService.getCurrencyRating(Arrays.asList(params));
-        return currencyRating;
+    public ResponseEntity<Map<String, Double>> getCurrenciesRatesForBase(@RequestParam(required = false) String base,
+                                                                         @RequestParam(required = false, defaultValue = "") String[] currencies) {
+        return ResponseEntity.ok(currencyService.getCurrencyRating(base, Arrays.asList(currencies)));
     }
+
+
 }
