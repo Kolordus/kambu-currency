@@ -1,5 +1,6 @@
 
 <div>
+  <p>Records in database: {{(allRates$ | async)?.length}}</p>
   <div *ngFor="let rate of allRates$ | async" style="background-color: darkgrey; border-radius: 10px">
     <p>Base currency: {{rate.base}}</p>
     <p>Desired currencies: </p>

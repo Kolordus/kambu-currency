@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*")
 @RequestMapping("/api")
 public class CurrencyController {
 
@@ -21,9 +21,14 @@ public class CurrencyController {
         this.currencyService = currencyService;
     }
 
-    @GetMapping("/get-all-available")
+    @GetMapping("/all-available-currencies")
     public ResponseEntity<List<String>> getAllAvailableCurrencies() {
         return ResponseEntity.ok(currencyService.getAllAvailableCurrencies());
+    }
+
+    @GetMapping("/all-requests")
+    public List<PersistedRequestDto> getAllRequests() {
+        return currencyService.getAllPersistedRequests();
     }
 
     @GetMapping("/convert")
@@ -33,15 +38,10 @@ public class CurrencyController {
         return ResponseEntity.ok(currencyService.convert(amount, base, desired));
     }
 
-    @GetMapping("/get-rates")
+    @GetMapping("/rates")
     public ResponseEntity<Map<String, Double>> getCurrenciesRatesForBase(@RequestParam(required = false, defaultValue = "PLN") String base,
                                                                          @RequestParam(required = false, defaultValue = "") String[] currencies) {
         return ResponseEntity.ok(currencyService.getCurrencyRating(base, Arrays.asList(currencies)));
-    }
-
-    @GetMapping("/all-requests")
-    public List<PersistedRequestDto> method() {
-        return currencyService.getAllPersistedRequests();
     }
 
 }

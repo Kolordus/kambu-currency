@@ -1,62 +1,39 @@
 package com.kolak.kambucurrency.service;
 
 import com.kolak.kambucurrency.model.dto.PersistedRequestDto;
-import org.junit.Assert;
+import com.kolak.kambucurrency.repository.CurrencyRepository;
+import com.kolak.kambucurrency.repository.PersistedRequestRepository;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 
 class CurrencyServiceTest {
 
+    @Mock
+    CurrencyRepository currencyRepository;
+
+    @Mock
+    PersistedRequestRepository persistedRequestRepository;
 
     @Test
     public void should_return_persisted_requests() {
-        //given
-        CurrencyService currencyService = mock(CurrencyService.class);
-        long expected = 3;
 
-        //when
-        when(currencyService.getAllPersistedRequests())
-                .thenReturn(createMockPersistedRequestList());
-
-        //then
-        Assert.assertEquals(expected, currencyService.getAllPersistedRequests().size());
     }
 
     @Test
     public void should_convert() {
-        //given
-        CurrencyService currencyService = mock(CurrencyService.class);
-        double expected = 450.0;
-
-        //when
-        when(currencyService.convert(100.0, "PLN", "GPB"))
-                .thenReturn(450.0);
-
-        //then
-//        Assert.assertEquals(expected, currencyService.convert(100.0, "PLN", "GPB"));
 
     }
 
     @Test
     public void should_throw_amount_exception() {
-        //given
-        CurrencyService currencyService = mock(CurrencyService.class);
 
-        //when
-        double convert = currencyService.convert(0.0, "PLN", "GPB");
-
-        //then
     }
-
-
 
     private List<PersistedRequestDto> createMockPersistedRequestList() {
 
