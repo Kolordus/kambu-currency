@@ -1,6 +1,7 @@
 package com.kolak.kambucurrency.controller;
 
 import com.kolak.kambucurrency.model.PersistedRequest;
+import com.kolak.kambucurrency.model.dto.PersistedRequestDto;
 import com.kolak.kambucurrency.service.CurrencyService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,10 +27,10 @@ public class CurrencyController {
     }
 
     @GetMapping("/convert")
-    public double convertCurrency(@RequestParam(defaultValue = "1") Double amount,
+    public ResponseEntity<Double> convertCurrency(@RequestParam(defaultValue = "1") Double amount,
                                   @RequestParam(defaultValue = "PLN") String base,
                                   @RequestParam(defaultValue = "EUR") String desired) {
-        return currencyService.convert(amount, base, desired);
+        return ResponseEntity.ok(currencyService.convert(amount, base, desired));
     }
 
     @GetMapping("/get-rates")
@@ -39,9 +40,8 @@ public class CurrencyController {
     }
 
     @GetMapping("/all-requests")
-    public List<PersistedRequest> method() {
-        return currencyService.elo();
+    public List<PersistedRequestDto> method() {
+        return currencyService.getAllPersistedRequests();
     }
-
 
 }

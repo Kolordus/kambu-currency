@@ -1,10 +1,12 @@
 package com.kolak.kambucurrency.service;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kolak.kambucurrency.exception.AmountMustBePositiveException;
 import com.kolak.kambucurrency.exception.CurrencyNotSupportedException;
 import com.kolak.kambucurrency.model.Currency;
 import com.kolak.kambucurrency.model.PersistedRequest;
+import com.kolak.kambucurrency.model.dto.PersistedRequestDto;
 import com.kolak.kambucurrency.model.nbpapi.CurrencyDetails;
 
 import com.kolak.kambucurrency.repository.PersistedRequestRepository;
@@ -57,7 +59,7 @@ public class CurrencyService {
         double desiredBase = getPlnRate(desired);
         double converted = formatDouble((baseRate / desiredBase) * amount);
 
-        saveToDB(amount, base, Collections.singletonMap(desired, converted));
+        saveToDB(amount, base, Collections.singletonMap(desired.toUpperCase(), converted));
 
         return formatDouble(converted);
     }
@@ -82,7 +84,7 @@ public class CurrencyService {
 
     public Map<String, Double> getCurrencyRating(String base, Map<String, Double> rates) {
         for (String currency : getAllAvailableCurrencies()) {
-            rates.put(currency, formatDouble(getPlnRate(base) / getPlnRate(currency)));
+            rates.put(currency.toUpperCase(), formatDouble(getPlnRate(base) / getPlnRate(currency)));
         }
         saveToDB(null, base, rates);
         return rates;
@@ -124,7 +126,15 @@ public class CurrencyService {
         persistedRequestRepository.save(persistedRequest);
     }
 
-    public List<PersistedRequest> elo() {
-        return persistedRequestRepository.findAll();
+    public List<PersistedRequestDto> getAllPersistedRequests() {
+        return persistedRequestRepository.findAll().stream()
+                .map(persistedRequest -> {
+                    PersistedRequestDto dto = new PersistedRequestDto();
+                    dto.setAmount(persistedRequest.getAmount());
+                    dto.setBase(persistedRequest.getBase());
+                    dto.setDesired(persistedRequest.getDesired());
+                    dto.setTimeCreated(persistedRequest.getTimeCreated());
+                    return dto;
+                }).collect(Collectors.toList());
     }
 }
