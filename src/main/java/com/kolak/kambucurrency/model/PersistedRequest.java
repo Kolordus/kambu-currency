@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 public class PersistedRequest {
@@ -19,7 +20,7 @@ public class PersistedRequest {
     private String base;
 
     @ElementCollection
-    private List<String> desired;
+    private Map<String, Double> desired;
 
     private LocalDateTime timeCreated;
 
@@ -50,11 +51,11 @@ public class PersistedRequest {
         this.base = base;
     }
 
-    public List<String> getDesired() {
+    public Map<String, Double> getDesired() {
         return desired;
     }
 
-    public void setDesired(List<String> desired) {
+    public void setDesired(Map<String, Double> desired) {
         this.desired = desired;
     }
 

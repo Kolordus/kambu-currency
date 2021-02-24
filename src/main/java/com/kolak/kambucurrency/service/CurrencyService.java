@@ -49,16 +49,17 @@ public class CurrencyService {
     }
 
     public double convert(Double amount, String base, String desired) {
-        double baseRate = getPlnRate(base);
-        double desiredBase = getPlnRate(desired);
-
         if (amount < 1) {
             throw new AmountMustBePositiveException();
         }
 
-        saveToDB(amount, base, Collections.singletonList(desired));
+        double baseRate = getPlnRate(base);
+        double desiredBase = getPlnRate(desired);
+        double converted = formatDouble((baseRate / desiredBase) * amount);
 
-        return formatDouble((baseRate / desiredBase) * amount);
+        saveToDB(amount, base, Collections.singletonMap(desired, converted));
+
+        return formatDouble(converted);
     }
 
 
@@ -74,16 +75,16 @@ public class CurrencyService {
                     formatDouble(getPlnRate(base) / getPlnRate(currency)));
         }
 
-        saveToDB(null, base, currenciesList);
+        saveToDB(null, base, rates);
         return rates;
     }
 
 
     public Map<String, Double> getCurrencyRating(String base, Map<String, Double> rates) {
-        saveToDB(null, base, getAllAvailableCurrencies());
         for (String currency : getAllAvailableCurrencies()) {
             rates.put(currency, formatDouble(getPlnRate(base) / getPlnRate(currency)));
         }
+        saveToDB(null, base, rates);
         return rates;
     }
 
@@ -113,11 +114,11 @@ public class CurrencyService {
         return Double.parseDouble(df.format(toFormat));
     }
 
-    public void saveToDB(Double amount, String base, List<String> desired) {
+    public void saveToDB(Double amount, String base, Map<String, Double> desired) {
         PersistedRequest persistedRequest = new PersistedRequest();
         persistedRequest.setAmount(amount);
         persistedRequest.setBase(base.toUpperCase());
-        persistedRequest.setDesired(desired.stream().map(String::toUpperCase).collect(Collectors.toList()));
+        persistedRequest.setDesired(desired);
         persistedRequest.setTimeCreated(LocalDateTime.now());
 
         persistedRequestRepository.save(persistedRequest);
