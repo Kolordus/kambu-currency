@@ -1,18 +1,14 @@
 package com.kolak.kambucurrency.service;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kolak.kambucurrency.exception.AmountMustBePositiveException;
 import com.kolak.kambucurrency.exception.CurrencyNotSupportedException;
 import com.kolak.kambucurrency.model.Currency;
 import com.kolak.kambucurrency.model.PersistedRequest;
 import com.kolak.kambucurrency.model.dto.PersistedRequestDto;
 import com.kolak.kambucurrency.model.nbpapi.CurrencyDetails;
-
-import com.kolak.kambucurrency.repository.PersistedRequestRepository;
 import com.kolak.kambucurrency.repository.CurrencyRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.kolak.kambucurrency.repository.PersistedRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -30,8 +26,6 @@ public class CurrencyService {
     private final static String JSON_FORMAT = "?format=json";
     private final static int MEDIUM_RATE = 0;
 
-    private final Logger logger = LoggerFactory.getLogger(CurrencyService.class);
-
     private final RestTemplate restTemplate;
     private final CurrencyRepository currencyRepository;
     private final PersistedRequestRepository persistedRequestRepository;
@@ -44,10 +38,21 @@ public class CurrencyService {
     }
 
     public List<String> getAllAvailableCurrencies() {
-
         return currencyRepository.findAll().stream()
                 .map(Currency::getCode)
                 .collect(Collectors.toList());
+    }
+
+    public List<PersistedRequestDto> getAllPersistedRequests() {
+        return persistedRequestRepository.findAll().stream()
+                .map(persistedRequest -> {
+                    PersistedRequestDto dto = new PersistedRequestDto();
+                    dto.setAmount(persistedRequest.getAmount());
+                    dto.setBase(persistedRequest.getBase());
+                    dto.setDesired(persistedRequest.getDesired());
+                    dto.setTimeCreated(persistedRequest.getTimeCreated());
+                    return dto;
+                }).collect(Collectors.toList());
     }
 
     public double convert(Double amount, String base, String desired) {
@@ -78,6 +83,7 @@ public class CurrencyService {
         }
 
         saveToDB(null, base, rates);
+
         return rates;
     }
 
@@ -90,8 +96,7 @@ public class CurrencyService {
         return rates;
     }
 
-
-    public double getPlnRate(String base) {
+    private double getPlnRate(String base) {
         if (currencyRepository.findAll().stream().noneMatch(currency -> currency.getCode().equals(base.toUpperCase()))) {
             throw new CurrencyNotSupportedException(base);
         }
@@ -109,14 +114,13 @@ public class CurrencyService {
         return baseCurrencyMidRate;
     }
 
-
-    public Double formatDouble(double toFormat) {
+    private static Double formatDouble(double toFormat) {
         DecimalFormat df = new DecimalFormat("####.##");
         df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
         return Double.parseDouble(df.format(toFormat));
     }
 
-    public void saveToDB(Double amount, String base, Map<String, Double> desired) {
+    private void saveToDB(Double amount, String base, Map<String, Double> desired) {
         PersistedRequest persistedRequest = new PersistedRequest();
         persistedRequest.setAmount(amount);
         persistedRequest.setBase(base.toUpperCase());
@@ -126,15 +130,4 @@ public class CurrencyService {
         persistedRequestRepository.save(persistedRequest);
     }
 
-    public List<PersistedRequestDto> getAllPersistedRequests() {
-        return persistedRequestRepository.findAll().stream()
-                .map(persistedRequest -> {
-                    PersistedRequestDto dto = new PersistedRequestDto();
-                    dto.setAmount(persistedRequest.getAmount());
-                    dto.setBase(persistedRequest.getBase());
-                    dto.setDesired(persistedRequest.getDesired());
-                    dto.setTimeCreated(persistedRequest.getTimeCreated());
-                    return dto;
-                }).collect(Collectors.toList());
-    }
 }

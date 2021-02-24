@@ -13,6 +13,16 @@ public class PersistedRequestDto {
     private Map<String, Double> desired;
     private LocalDateTime timeCreated;
 
+    public PersistedRequestDto() {
+    }
+
+    public PersistedRequestDto(Double amount, String base, Map<String, Double> desired, LocalDateTime timeCreated) {
+        this.amount = amount;
+        this.base = base;
+        this.desired = desired;
+        this.timeCreated = timeCreated;
+    }
+
     public Double getAmount() {
         return amount;
     }

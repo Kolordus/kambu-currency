@@ -1,0 +1,12 @@
+
+<div>
+  <div *ngFor="let rate of allRates$ | async" style="background-color: darkgrey; border-radius: 10px">
+    <p>Base currency: {{rate.base}}</p>
+    <p>Desired currencies: </p>
+    <p *ngFor="let desired of rate.desired | keyvalue">
+      {{desired.key.toUpperCase()}}: {{desired.value}}
+    </p>
+    <p *ngIf="rate.amount">Amount: {{rate.amount}}</p>
+    <p>Time: {{rate.timeCreated}}</p>
+  </div>
+</div>
