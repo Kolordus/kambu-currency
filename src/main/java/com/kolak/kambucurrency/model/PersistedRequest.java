@@ -1,24 +1,29 @@
-package com.kolak.kambucurrency.model.apirequest;
+package com.kolak.kambucurrency.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
-public class ApiRequestModel {
+public class PersistedRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Double amount;
     private String base;
-    private String desired;
+
+    @ElementCollection
+    private List<String> desired;
+
     private LocalDateTime timeCreated;
 
-    public ApiRequestModel() {
+    public PersistedRequest() {
     }
 
     public Long getId() {
@@ -45,11 +50,11 @@ public class ApiRequestModel {
         this.base = base;
     }
 
-    public String getDesired() {
+    public List<String> getDesired() {
         return desired;
     }
 
-    public void setDesired(String desired) {
+    public void setDesired(List<String> desired) {
         this.desired = desired;
     }
 
@@ -59,5 +64,16 @@ public class ApiRequestModel {
 
     public void setTimeCreated(LocalDateTime timeCreated) {
         this.timeCreated = timeCreated;
+    }
+
+    @Override
+    public String toString() {
+        return "PersistedRequest{" +
+                "id=" + id +
+                ", amount=" + amount +
+                ", base='" + base + '\'' +
+                ", desired=" + desired +
+                ", timeCreated=" + timeCreated +
+                '}';
     }
 }

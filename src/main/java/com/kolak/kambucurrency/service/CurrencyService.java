@@ -4,10 +4,10 @@ package com.kolak.kambucurrency.service;
 import com.kolak.kambucurrency.exception.AmountMustBePositiveException;
 import com.kolak.kambucurrency.exception.CurrencyNotSupportedException;
 import com.kolak.kambucurrency.model.Currency;
-import com.kolak.kambucurrency.model.apirequest.ApiRequestModel;
+import com.kolak.kambucurrency.model.PersistedRequest;
 import com.kolak.kambucurrency.model.nbpapi.CurrencyDetails;
 
-import com.kolak.kambucurrency.repository.ApiRequestRepository;
+import com.kolak.kambucurrency.repository.PersistedRequestRepository;
 import com.kolak.kambucurrency.repository.CurrencyRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,10 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,17 +32,16 @@ public class CurrencyService {
 
     private final RestTemplate restTemplate;
     private final CurrencyRepository currencyRepository;
-    private final ApiRequestRepository apiRequestRepository;
+    private final PersistedRequestRepository persistedRequestRepository;
 
     @Autowired
-    public CurrencyService(CurrencyRepository currencyRepository, ApiRequestRepository apiRequestRepository) {
+    public CurrencyService(CurrencyRepository currencyRepository, PersistedRequestRepository persistedRequestRepository) {
         this.currencyRepository = currencyRepository;
-        this.apiRequestRepository = apiRequestRepository;
+        this.persistedRequestRepository = persistedRequestRepository;
         restTemplate = new RestTemplate();
     }
 
     public List<String> getAllAvailableCurrencies() {
-        saveToDB(1, "PLN", "all");
 
         return currencyRepository.findAll().stream()
                 .map(Currency::getCode)
@@ -60,7 +56,7 @@ public class CurrencyService {
             throw new AmountMustBePositiveException();
         }
 
-        saveToDB(amount, base, desired);
+        saveToDB(amount, base, Collections.singletonList(desired));
 
         return formatDouble((baseRate / desiredBase) * amount);
     }
@@ -68,35 +64,26 @@ public class CurrencyService {
 
     public Map<String, Double> getCurrencyRating(String base, List<String> currenciesList) {
         Map<String, Double> rates = new HashMap<>();
-        saveToDB(1, base, "chosen");
-
-        double baseRate = getPlnRate(base);
 
         if (currenciesList.isEmpty()) {
-            return getCurrencyRating(baseRate, rates);
+            return getCurrencyRating(base, rates);
         }
 
         for (String currency : currenciesList) {
             rates.put(currency.toUpperCase(),
-                    formatDouble(baseRate / getPlnRate(currency)));
+                    formatDouble(getPlnRate(base) / getPlnRate(currency)));
         }
 
+        saveToDB(null, base, currenciesList);
         return rates;
     }
 
 
-    public Map<String, Double> getCurrencyRating(double baseRate, Map<String, Double> rates) {
-        for (Currency currency : currencyRepository.findAll()) {
-            rates.put(currency.getCode(), formatDouble(baseRate / getPlnRate(currency.getCode())));
+    public Map<String, Double> getCurrencyRating(String base, Map<String, Double> rates) {
+        saveToDB(null, base, getAllAvailableCurrencies());
+        for (String currency : getAllAvailableCurrencies()) {
+            rates.put(currency, formatDouble(getPlnRate(base) / getPlnRate(currency)));
         }
-        return rates;
-    }
-
-    public Map<String, Double> getCurrencyRating(Map<String, Double> rates) {
-        for (Currency currency : currencyRepository.findAll()) {
-            rates.put(currency.getCode().toUpperCase(), getPlnRate(currency.getCode()));
-        }
-
         return rates;
     }
 
@@ -126,14 +113,17 @@ public class CurrencyService {
         return Double.parseDouble(df.format(toFormat));
     }
 
-    public void saveToDB(double amount, String base, String desired) {
-        ApiRequestModel apiRequestModel = new ApiRequestModel();
-        apiRequestModel.setAmount(amount);
-        apiRequestModel.setBase(base);
-        apiRequestModel.setDesired(desired);
-        apiRequestModel.setTimeCreated(LocalDateTime.now());
+    public void saveToDB(Double amount, String base, List<String> desired) {
+        PersistedRequest persistedRequest = new PersistedRequest();
+        persistedRequest.setAmount(amount);
+        persistedRequest.setBase(base.toUpperCase());
+        persistedRequest.setDesired(desired.stream().map(String::toUpperCase).collect(Collectors.toList()));
+        persistedRequest.setTimeCreated(LocalDateTime.now());
 
-        apiRequestRepository.save(apiRequestModel);
+        persistedRequestRepository.save(persistedRequest);
     }
 
+    public List<PersistedRequest> elo() {
+        return persistedRequestRepository.findAll();
+    }
 }
