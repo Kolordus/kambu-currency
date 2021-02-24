@@ -1,5 +1,6 @@
 package com.kolak.kambucurrency.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.persistence.*;
@@ -9,20 +10,27 @@ import java.util.Map;
 @Entity
 public class PersistedRequest {
 
+    @JsonIgnore
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Double amount;
-    private String base;
+//    @JsonInclude(JsonInclude.Include.NON_NULL)
+//    private Double amount;
+//    private String base;
+//
+//    @ElementCollection
+//    private Map<String, Double> desiredCurrencies;
 
-    @ElementCollection
-    private Map<String, Double> desired;
-
+    private String requestUrl;
     private LocalDateTime timeCreated;
 
     public PersistedRequest() {
+    }
+
+    public PersistedRequest(String requestUrl, LocalDateTime timeCreated) {
+        this.requestUrl = requestUrl;
+        this.timeCreated = timeCreated;
     }
 
     public Long getId() {
@@ -33,28 +41,12 @@ public class PersistedRequest {
         this.id = id;
     }
 
-    public Double getAmount() {
-        return amount;
+    public String getRequestUrl() {
+        return requestUrl;
     }
 
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
-
-    public String getBase() {
-        return base;
-    }
-
-    public void setBase(String base) {
-        this.base = base;
-    }
-
-    public Map<String, Double> getDesired() {
-        return desired;
-    }
-
-    public void setDesired(Map<String, Double> desired) {
-        this.desired = desired;
+    public void setRequestUrl(String requestUrl) {
+        this.requestUrl = requestUrl;
     }
 
     public LocalDateTime getTimeCreated() {
@@ -63,16 +55,5 @@ public class PersistedRequest {
 
     public void setTimeCreated(LocalDateTime timeCreated) {
         this.timeCreated = timeCreated;
-    }
-
-    @Override
-    public String toString() {
-        return "PersistedRequest{" +
-                "id=" + id +
-                ", amount=" + amount +
-                ", base='" + base + '\'' +
-                ", desired=" + desired +
-                ", timeCreated=" + timeCreated +
-                '}';
     }
 }

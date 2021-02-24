@@ -7,6 +7,14 @@ public class CurrencyDetails {
     private String code;
     private List<Rate> rates;
 
+    public CurrencyDetails() {
+    }
+
+    public CurrencyDetails(String code, List<Rate> rates) {
+        this.code = code;
+        this.rates = rates;
+    }
+
     public String getCode() {
         return code;
     }
