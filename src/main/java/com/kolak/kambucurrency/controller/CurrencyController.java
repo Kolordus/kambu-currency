@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api")
 public class CurrencyController {
 
@@ -37,7 +38,7 @@ public class CurrencyController {
         return ResponseEntity.ok(currencyService.getCurrencyRating(base, Arrays.asList(currencies)));
     }
 
-    @GetMapping("/elo")
+    @GetMapping("/all-requests")
     public List<PersistedRequest> method() {
         return currencyService.elo();
     }

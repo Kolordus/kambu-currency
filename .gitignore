@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+testdbab.trace
+testdbab.mv.db
+mvnw.cmd
