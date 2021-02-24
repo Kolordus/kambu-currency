@@ -26,12 +26,14 @@ public class CurrencyController {
     }
 
     @GetMapping("/convert")
-    public double convertCurrency(@RequestParam Double amount, @RequestParam String base, @RequestParam String desired) {
+    public double convertCurrency(@RequestParam(defaultValue = "1") Double amount,
+                                  @RequestParam(defaultValue = "PLN") String base,
+                                  @RequestParam(defaultValue = "EUR") String desired) {
         return currencyService.convert(amount, base, desired);
     }
 
     @GetMapping("/get-rating")
-    public ResponseEntity<Map<String, Double>> getCurrenciesRatesForBase(@RequestParam(required = false) String base,
+    public ResponseEntity<Map<String, Double>> getCurrenciesRatesForBase(@RequestParam(required = false, defaultValue = "PLN") String base,
                                                                          @RequestParam(required = false, defaultValue = "") String[] currencies) {
         return ResponseEntity.ok(currencyService.getCurrencyRating(base, Arrays.asList(currencies)));
     }

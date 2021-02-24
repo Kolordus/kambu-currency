@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.time.LocalDateTime;
 
 @Entity
 public class ApiRequestModel {
@@ -15,6 +16,7 @@ public class ApiRequestModel {
     private Double amount;
     private String base;
     private String desired;
+    private LocalDateTime timeCreated;
 
     public ApiRequestModel() {
     }
@@ -49,5 +51,13 @@ public class ApiRequestModel {
 
     public void setDesired(String desired) {
         this.desired = desired;
+    }
+
+    public LocalDateTime getTimeCreated() {
+        return timeCreated;
+    }
+
+    public void setTimeCreated(LocalDateTime timeCreated) {
+        this.timeCreated = timeCreated;
     }
 }
