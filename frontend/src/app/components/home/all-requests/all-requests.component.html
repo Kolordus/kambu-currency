@@ -1,13 +1,12 @@
 
 <div>
   <p>Records in database: {{(allRates$ | async)?.length}}</p>
-  <div *ngFor="let rate of allRates$ | async" style="background-color: darkgrey; border-radius: 10px">
-    <p>Base currency: {{rate.base}}</p>
-    <p>Desired currencies: </p>
-    <p *ngFor="let desired of rate.desired | keyvalue">
-      {{desired.key.toUpperCase()}}: {{desired.value}}
-    </p>
-    <p *ngIf="rate.amount">Amount: {{rate.amount}}</p>
-    <p>Time: {{rate.timeCreated}}</p>
+  <div *ngFor="let rate of allRates$ | async" class="tile">
+    <div class="to-the-right">
+      <h5>Request URL: </h5>
+      <p>{{rate.requestUrl}}</p>
+      <h5>Time: </h5>
+      <p>{{rate.timeCreated}}</p>
+    </div>
   </div>
 </div>

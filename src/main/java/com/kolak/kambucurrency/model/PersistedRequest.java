@@ -1,11 +1,12 @@
 package com.kolak.kambucurrency.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.time.LocalDateTime;
-import java.util.Map;
 
 @Entity
 public class PersistedRequest {
@@ -14,13 +15,6 @@ public class PersistedRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-//    @JsonInclude(JsonInclude.Include.NON_NULL)
-//    private Double amount;
-//    private String base;
-//
-//    @ElementCollection
-//    private Map<String, Double> desiredCurrencies;
 
     private String requestUrl;
     private LocalDateTime timeCreated;

@@ -14,8 +14,10 @@ import org.springframework.web.client.RestTemplate;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,11 +33,11 @@ public class CurrencyService {
     private final PersistedRequestRepository persistedRequestRepository;
 
     @Autowired
-    public CurrencyService(UrlService urlService, CurrencyRepository currencyRepository, PersistedRequestRepository persistedRequestRepository) {
+    public CurrencyService(RestTemplate restTemplate, UrlService urlService, CurrencyRepository currencyRepository, PersistedRequestRepository persistedRequestRepository) {
+        this.restTemplate = restTemplate;
         this.urlService = urlService;
         this.currencyRepository = currencyRepository;
         this.persistedRequestRepository = persistedRequestRepository;
-        restTemplate = new RestTemplate();
     }
 
     public List<String> getAllAvailableCurrencies() {
@@ -81,7 +83,7 @@ public class CurrencyService {
         return rates;
     }
 
-    public Map<String, Double> getCurrencyRating(String base, Map<String, Double> rates) {
+    private Map<String, Double> getCurrencyRating(String base, Map<String, Double> rates) {
         for (Currency currency : currencyRepository.findAll()) {
             rates.put(currency.getCode().toUpperCase(), formatDouble(getPlnRate(base) / getPlnRate(currency.getCode())));
         }
@@ -95,7 +97,6 @@ public class CurrencyService {
             throw new CurrencyNotSupportedException(base);
         }
 
-
         if (base.toUpperCase().equals("PLN")) {
             return 1.0d;
         }
@@ -103,13 +104,12 @@ public class CurrencyService {
         CurrencyDetails currencyDetails =
                 restTemplate.getForObject(CURRENCY_API_URL + base + JSON_FORMAT, CurrencyDetails.class);
 
-
         double baseCurrencyMidRate = 0d;
 
-        if (currencyDetails != null)
+        if (currencyDetails != null){
+            urlService.saveRequest(CURRENCY_API_URL + base + JSON_FORMAT);
             return currencyDetails.getRates().get(MEDIUM_RATE).getMid();
-
-        urlService.saveRequest(CURRENCY_API_URL + base + JSON_FORMAT);
+        }
 
         return baseCurrencyMidRate;
     }
@@ -125,16 +125,5 @@ public class CurrencyService {
         df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
         return Double.parseDouble(df.format(toFormat));
     }
-
-//    private void saveToDB(Double amount, String base, Map<String, Double> desired) {
-//        PersistedRequest persistedRequest = new PersistedRequest();
-//        persistedRequest.setAmount(amount);
-//        persistedRequest.setBase(base.toUpperCase());
-//        persistedRequest.setDesiredCurrencies(desired);
-//        persistedRequest.setTimeCreated(LocalDateTime.now());
-//
-//        persistedRequestRepository.save(persistedRequest);
-//    }
-
 
 }

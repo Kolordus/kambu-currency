@@ -3,16 +3,8 @@ create table currency (
     code varchar(3) not null
 );
 
--- create table persisted_request(
---     id serial primary key,
---     amount real,
---     base varchar (3),
---     time_created timestamp
--- );
-
 create table persisted_request(
     id serial primary key,
-    amount real,
-    base varchar (3),
+    request_url varchar (255),
     time_created timestamp
 );

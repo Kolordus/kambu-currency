@@ -48,7 +48,7 @@ If base or desired currency code is not contained in the app then it throws an e
 
 if amount is not a positive number it throws an exception (AmountMustBePositive with code 400).
 
-Returned value is type double.
+Returned value is of type double.
     
     
 
@@ -58,26 +58,24 @@ Returned value is type double.
  curl -X GET "http://localhost:8080/api/all-requests"
  ```
 
-Returns all persisted requests from the database.
+Returns all api (from this API and external) requests persisted in the database.
 
 Example response JSON:
 ```
-    {
-        "base": "AUD",
-        "desired": {
-            "GBP": 0.56,
-            "USD": 0.79
+    [
+        {
+            "requestUrl": "http://localhost:8080/api/all-available-currencies",
+            "timeCreated": "2021-02-24T23:53:17.432"
         },
-        "timeCreated": "2021-02-24T13:34:11.411"
-    },
-    {
-         "amount": 100.0,
-         "base": "GBP",
-         "desired": {
-             "eur": 116.44
-         },
-         "timeCreated": "2021-02-24T13:38:12.881"
-     }
+        {
+            "requestUrl": "http://localhost:8080/api/all-available-currencies",
+            "timeCreated": "2021-02-24T23:53:17.448"
+        },
+        {
+            "requestUrl": "http://api.nbp.pl/api/exchangerates/rates/a/eur?format=json",
+            "timeCreated": "2021-02-24T23:53:18.859"
+        }
+    ]
 
 ```
 #### 4./rates
@@ -100,7 +98,7 @@ If base or desired currency code is not contained in the app then it throws an e
 
 ## GUI
 
-In order to run frontend perform these steps:
+In order to run frontend localy perform these steps:
 
 1. Ensure that the Spring Boot application is on
 2. Open frontend folder in terminal and execute command

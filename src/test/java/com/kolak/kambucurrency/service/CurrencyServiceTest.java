@@ -5,25 +5,21 @@ import com.kolak.kambucurrency.model.nbpapi.CurrencyDetails;
 import com.kolak.kambucurrency.model.nbpapi.Rate;
 import com.kolak.kambucurrency.repository.CurrencyRepository;
 import com.kolak.kambucurrency.repository.PersistedRequestRepository;
+import org.assertj.core.util.Lists;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.junit.MockitoRule;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestTemplate;
 
 import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Collections;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.*;
 
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,14 +28,13 @@ class CurrencyServiceTest {
     private final static String CURRENCY_API_URL = "http://api.nbp.pl/api/exchangerates/rates/a/";
     private final static String JSON_FORMAT = "?format=json";
 
-    @Mock
-    CurrencyRepository currencyRepository;
+    @Mock CurrencyRepository currencyRepository;
 
-    @Mock
-    PersistedRequestRepository persistedRequestRepository;
+    @Mock PersistedRequestRepository persistedRequestRepository;
 
-    @Mock
-    RestTemplate restTemplate;
+    @Mock UrlService urlService;
+
+    @Mock RestTemplate restTemplate;
 
     @InjectMocks
     CurrencyService currencyService;
@@ -48,27 +43,131 @@ class CurrencyServiceTest {
     @Test
     public void shouldConvert() {
         // given
-        when(currencyRepository.findAll())
-                .thenReturn(Arrays.asList(
-                        new Currency("PLN"),
-                        new Currency("GBP")
-                ));
+        final double gbpRate = 5.0;
+        final double amount = 10.0;
 
-        when(restTemplate.getForObject(CURRENCY_API_URL + "GBP" + JSON_FORMAT, CurrencyDetails.class))
-                .thenReturn(new CurrencyDetails("GBP", Collections.singletonList(new Rate(5.0))));
-        when(restTemplate.getForObject(CURRENCY_API_URL + "PLN" + JSON_FORMAT, CurrencyDetails.class))
-                .thenReturn(new CurrencyDetails("PLN", Collections.singletonList(new Rate(1.0))));
+        when(currencyRepository.findAll())
+                .thenReturn(createCurrenciesList());
+
+
+        doReturn(new CurrencyDetails("GBP", Collections.singletonList(new Rate(gbpRate))))
+                .when(restTemplate).getForObject(CURRENCY_API_URL + "GBP" + JSON_FORMAT, CurrencyDetails.class);
 
         // when
-        double convert = currencyService.convert(100.0, "GBP", "PLN");
-        double excepted = 500.0;
-        Assert.assertEquals(excepted, convert, 0.0);
+        double convert = currencyService.convert(amount, "GBP", "PLN");
+        double excepted = gbpRate * amount;
 
+        // then
+        Assert.assertEquals(excepted, convert, 0.0);
     }
 
     @Test
-    public void should_throw_amount_exception() {
+    public void shouldConvert1() {
+        // given
+        double eurRate = 1.5;
+        double audRate = 1.4;
+        double amount = 4.0;
 
+        when(currencyRepository.findAll())
+                .thenReturn(createCurrenciesList());
+
+        doReturn(new CurrencyDetails("EUR", Collections.singletonList(new Rate(eurRate))))
+                .when(restTemplate).getForObject(CURRENCY_API_URL + "EUR" + JSON_FORMAT, CurrencyDetails.class);
+
+        doReturn(new CurrencyDetails("AUD", Collections.singletonList(new Rate(audRate))))
+                .when(restTemplate).getForObject(CURRENCY_API_URL + "AUD" + JSON_FORMAT, CurrencyDetails.class);
+
+        // when
+        double convert = currencyService.convert(amount, "EUR", "AUD");
+        double excepted = formatDouble((eurRate / audRate) * amount);
+
+        // then
+        Assert.assertEquals(excepted, convert, 0.0);
+    }
+
+    @Test
+    public void shouldReturnCurrencyRatingForTwoOtherCurrencies() {
+        // given
+        String base = "GBP";
+        List<String> currenciesList = Arrays.asList("EUR", "AUD");
+        double eurRate = 1.5;
+        double audRate = 1.4;
+        double gbpRate = 1.1;
+
+        when(currencyRepository.findAll()).thenReturn(createCurrenciesList());
+
+        doReturn(new CurrencyDetails("GBP", Collections.singletonList(new Rate(gbpRate))))
+                .when(restTemplate).getForObject(CURRENCY_API_URL + "GBP" + JSON_FORMAT, CurrencyDetails.class);
+
+        doReturn(new CurrencyDetails("EUR", Collections.singletonList(new Rate(eurRate))))
+                .when(restTemplate).getForObject(CURRENCY_API_URL + "EUR" + JSON_FORMAT, CurrencyDetails.class);
+
+        doReturn(new CurrencyDetails("AUD", Collections.singletonList(new Rate(audRate))))
+                .when(restTemplate).getForObject(CURRENCY_API_URL + "AUD" + JSON_FORMAT, CurrencyDetails.class);
+
+        // when
+        Map<String, Double> currencyRating = currencyService.getCurrencyRating(base, currenciesList);
+
+        // then
+        double expectedGbpToEur = formatDouble(gbpRate / eurRate);
+
+        Assert.assertFalse(currencyRating.isEmpty());
+        Assert.assertEquals(currenciesList.size(), currencyRating.size());
+        Assert.assertEquals(expectedGbpToEur, currencyRating.get("EUR"), 0.0);
+    }
+
+    @Test
+    public void shouldReturnCurrencyRatingForAllOtherCurrencies() {
+        // given
+        String base = "GBP";
+
+        List<String> currenciesList = Arrays.asList("EUR", "AUD", "GBP", "JPY", "HUF");
+        double eurRate = 1.5;
+        double audRate = 1.4;
+        double gbpRate = 1.0;
+        double jpyRate = 0.2;
+        double hufRate = 0.1;
+
+        when(currencyRepository.findAll()).thenReturn(createCurrenciesList());
+
+        doReturn(new CurrencyDetails("GBP", Collections.singletonList(new Rate(gbpRate))))
+                .when(restTemplate).getForObject(CURRENCY_API_URL + "GBP" + JSON_FORMAT, CurrencyDetails.class);
+
+        doReturn(new CurrencyDetails("EUR", Collections.singletonList(new Rate(eurRate))))
+                .when(restTemplate).getForObject(CURRENCY_API_URL + "EUR" + JSON_FORMAT, CurrencyDetails.class);
+
+        doReturn(new CurrencyDetails("AUD", Collections.singletonList(new Rate(audRate))))
+                .when(restTemplate).getForObject(CURRENCY_API_URL + "AUD" + JSON_FORMAT, CurrencyDetails.class);
+
+        doReturn(new CurrencyDetails("JPY", Collections.singletonList(new Rate(jpyRate))))
+                .when(restTemplate).getForObject(CURRENCY_API_URL + "JPY" + JSON_FORMAT, CurrencyDetails.class);
+
+        doReturn(new CurrencyDetails("HUF", Collections.singletonList(new Rate(hufRate))))
+                .when(restTemplate).getForObject(CURRENCY_API_URL + "HUF" + JSON_FORMAT, CurrencyDetails.class);
+        // when
+        Map<String, Double> currencyRating = currencyService.getCurrencyRating(base, currenciesList);
+
+        // then
+        Assert.assertFalse(currencyRating.isEmpty());
+        Assert.assertEquals(currenciesList.size(), currencyRating.size());
+    }
+
+
+    private static Double formatDouble(double toFormat) {
+        DecimalFormat df = new DecimalFormat("####.##");
+        df.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.ENGLISH));
+        return Double.parseDouble(df.format(toFormat));
+    }
+
+    public List<Currency> createCurrenciesList() {
+        return Arrays.asList(
+                new Currency("EUR"),
+                new Currency("GBP"),
+                new Currency("PLN"),
+                new Currency("JPY"),
+                new Currency("HUF"),
+                new Currency("AUD")
+        );
     }
 
 }

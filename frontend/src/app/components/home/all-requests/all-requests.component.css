@@ -1,0 +1,10 @@
+.tile {
+  background-color: whitesmoke;
+  border-radius: 10px;
+}
+
+.to-the-right {
+  padding: 5px;
+  margin-left: 5px;
+  margin-bottom: 5px;
+}
