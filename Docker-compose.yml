@@ -4,12 +4,11 @@ version: '3'
 services:
 
   #PostgreSQL
-  currency-postgres:
+  db:
     image: 'postgres:13.1-alpine'
-    container_name: currency-postgres
+    container_name: db
     ports:
       - 5432:5432
-
     environment:
       - POSTGRES_DB=currconv
       - POSTGRES_USER=kambu
@@ -23,15 +22,10 @@ services:
       context: .
     container_name: currency-app
     depends_on:
-      - currency-postgres
+      - db
 
     environment:
-      - DB_SERVER=currency-postgres
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://currency-postgres:5432/currconv
-      - POSTGRES_DB=currconv
-      - POSTGRES_USER=kambu
-      - POSTGRES_PASSWORD=kambu123@
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=none
+      - spring.profiles.active=prod
     ports:
       - 8080:8080
     links:

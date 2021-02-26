@@ -61,19 +61,25 @@ Returned value is of type double.
 Returns all api (from this API and external) requests persisted in the database.
 
 Example response JSON:
+
 ```
     [
         {
-            "requestUrl": "http://localhost:8080/api/all-available-currencies",
-            "timeCreated": "2021-02-24T23:53:17.432"
+            "requestUrl": "http://localhost:8080/api/rates?currencies=usd,isk",
+            "timeCreated": "2021-02-26T17:24:14.041",
+            "baseCurrency": "PLN",
+            "desiredCurrencies": {
+                "ISK": 33.85,
+                "USD": 0.27
+            },
+            "invokedExternalApiUrls": [
+                "http://api.nbp.pl/api/exchangerates/rates/a/usd?format=json",
+                "http://api.nbp.pl/api/exchangerates/rates/a/isk?format=json"
+            ]
         },
         {
-            "requestUrl": "http://localhost:8080/api/all-available-currencies",
-            "timeCreated": "2021-02-24T23:53:17.448"
-        },
-        {
-            "requestUrl": "http://api.nbp.pl/api/exchangerates/rates/a/eur?format=json",
-            "timeCreated": "2021-02-24T23:53:18.859"
+            "requestUrl": "http://localhost:8080/api/all-requests",
+            "timeCreated": "2021-02-26T17:25:36.004"
         }
     ]
 
@@ -94,13 +100,19 @@ By default, base is set to 'PLN' and if no currencies are specified then list of
 
 If base or desired currency code is not contained in the app then it throws an exception (CurrencyNotSupportedException with code 400).
 
-
+Example response JSON:
+```
+   {
+       "ISK": 33.85,
+       "USD": 0.27
+   }
+```
 
 ## GUI
 
-In order to run frontend localy perform these steps:
+In order to run frontend locally perform these steps:
 
-1. Ensure that the Spring Boot application is on
+1. Ensure that the Spring Boot application is on (with profile local)
 2. Open frontend folder in terminal and execute command
 
     ```
