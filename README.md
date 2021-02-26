@@ -10,7 +10,7 @@ Rest API provides 4 endpoints preceded by
 #### 1. /get-all-available
 
 ```
-    curl -X GET "http://localhost:8080/api/get-all-available"
+    curl -X GET "http://localhost:8080/api/get-all-available-currencies"
 ```
 This endpoint returns list of strings with codes of supported currencies.
 
