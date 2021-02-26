@@ -5,7 +5,6 @@ import com.kolak.kambucurrency.model.nbpapi.CurrencyDetails;
 import com.kolak.kambucurrency.model.nbpapi.Rate;
 import com.kolak.kambucurrency.repository.CurrencyRepository;
 import com.kolak.kambucurrency.repository.PersistedRequestRepository;
-import org.assertj.core.util.Lists;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestTemplate;
 
-import java.lang.reflect.Array;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.*;
@@ -30,15 +28,10 @@ class CurrencyServiceTest {
 
     @Mock CurrencyRepository currencyRepository;
 
-    @Mock PersistedRequestRepository persistedRequestRepository;
-
-    @Mock UrlService urlService;
-
     @Mock RestTemplate restTemplate;
 
     @InjectMocks
     CurrencyService currencyService;
-
 
     @Test
     public void shouldConvert() {
@@ -48,7 +41,6 @@ class CurrencyServiceTest {
 
         when(currencyRepository.findAll())
                 .thenReturn(createCurrenciesList());
-
 
         doReturn(new CurrencyDetails("GBP", Collections.singletonList(new Rate(gbpRate))))
                 .when(restTemplate).getForObject(CURRENCY_API_URL + "GBP" + JSON_FORMAT, CurrencyDetails.class);
@@ -148,8 +140,21 @@ class CurrencyServiceTest {
         Map<String, Double> currencyRating = currencyService.getCurrencyRating(base, currenciesList);
 
         // then
+        double expectedGbpToEur = formatDouble(gbpRate / eurRate);
+        double expectedGbpToGbp = formatDouble(gbpRate / gbpRate);
+        double expectedGbpToAud = formatDouble(gbpRate / audRate);
+        double expectedGbpToJpy = formatDouble(gbpRate / jpyRate);
+        double expectedGbpToHuf = formatDouble(gbpRate / hufRate);
+
+        Assert.assertEquals(expectedGbpToEur, currencyRating.get("EUR"), 0.0);
+        Assert.assertEquals(expectedGbpToGbp, currencyRating.get("GBP"), 0.0);
+        Assert.assertEquals(expectedGbpToAud, currencyRating.get("AUD"), 0.0);
+        Assert.assertEquals(expectedGbpToJpy, currencyRating.get("JPY"), 0.0);
+        Assert.assertEquals(expectedGbpToHuf, currencyRating.get("HUF"), 0.0);
+
         Assert.assertFalse(currencyRating.isEmpty());
         Assert.assertEquals(currenciesList.size(), currencyRating.size());
+
     }
 
 

@@ -14,10 +14,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,12 +53,11 @@ public class CurrencyService {
         if (amount < 1) {
             throw new AmountMustBePositiveException();
         }
-
         double baseRate = getPlnRate(base);
         double desiredBase = getPlnRate(desired);
         double converted = formatDouble((baseRate / desiredBase) * amount);
 
-        urlService.saveRequest();
+        urlService.saveRequest(amount, base.toUpperCase(), Collections.singletonMap(desired.toUpperCase(), converted));
 
         return formatDouble(converted);
     }
@@ -78,7 +74,7 @@ public class CurrencyService {
                     formatDouble(getPlnRate(base) / getPlnRate(currency)));
         }
 
-        urlService.saveRequest();
+        urlService.saveRequest(null, base.toUpperCase(), rates);
 
         return rates;
     }
@@ -87,8 +83,8 @@ public class CurrencyService {
         for (Currency currency : currencyRepository.findAll()) {
             rates.put(currency.getCode().toUpperCase(), formatDouble(getPlnRate(base) / getPlnRate(currency.getCode())));
         }
-//        saveToDB(null, base, rates);
-        urlService.saveRequest();
+        urlService.saveRequest(base.toUpperCase(), rates);
+
         return rates;
     }
 
@@ -107,7 +103,7 @@ public class CurrencyService {
         double baseCurrencyMidRate = 0d;
 
         if (currencyDetails != null){
-            urlService.saveRequest(CURRENCY_API_URL + base + JSON_FORMAT);
+            urlService.saveRequestExternalService(CURRENCY_API_URL + base + JSON_FORMAT);
             return currencyDetails.getRates().get(MEDIUM_RATE).getMid();
         }
 

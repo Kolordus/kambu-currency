@@ -2,11 +2,9 @@ package com.kolak.kambucurrency.controller;
 
 import com.kolak.kambucurrency.model.PersistedRequest;
 import com.kolak.kambucurrency.service.CurrencyService;
-import com.kolak.kambucurrency.service.UrlService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +21,7 @@ public class CurrencyController {
     }
 
     @GetMapping("/all-available-currencies")
-    public ResponseEntity<List<String>> getAllAvailableCurrencies(HttpServletRequest req) {
+    public ResponseEntity<List<String>> getAllAvailableCurrencies() {
         return ResponseEntity.ok(currencyService.getAllAvailableCurrencies());
     }
 

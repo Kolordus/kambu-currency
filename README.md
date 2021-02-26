@@ -90,9 +90,7 @@ Takes 2 parameters: base (string) and currencies (array of strings).
 
 Returns information about the exchange rate between the base currency and selected currencies.
 
-By default, base is set to 'PLN' and currencies are set to 'EUR'.
-
-If no currencies are specified then list of all available currencies with rates is return.
+By default, base is set to 'PLN' and if no currencies are specified then list of all available currencies with rates is return.
 
 If base or desired currency code is not contained in the app then it throws an exception (CurrencyNotSupportedException with code 400).
 

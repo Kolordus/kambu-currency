@@ -2,6 +2,7 @@ package com.kolak.kambucurrency.service;
 
 import com.kolak.kambucurrency.model.PersistedRequest;
 import com.kolak.kambucurrency.repository.PersistedRequestRepository;
+import org.apache.tomcat.jni.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -22,8 +23,34 @@ public class UrlService {
         this.persistedRequestRepository = persistedRequestRepository;
     }
 
-    public void saveRequest() {
 
+    public void saveRequest() {
+        PersistedRequest persistedRequest = new PersistedRequest();
+        persistedRequest.setRequestUrl(getRequest());
+        persistedRequest.setTimeCreated(LocalDateTime.now());
+        persistedRequestRepository.save(persistedRequest);
+    }
+
+    public void saveRequest(String base, Map<String, Double> desiredCurrencies) {
+        PersistedRequest persistedRequest = new PersistedRequest();
+        persistedRequest.setRequestUrl(getRequest());
+        persistedRequest.setBaseCurrency(base);
+        persistedRequest.setTimeCreated(LocalDateTime.now());
+        persistedRequestRepository.save(persistedRequest);
+    }
+
+    public void saveRequest(Double amount, String base, Map<String, Double> desiredCurrencies) {
+        persistedRequestRepository.save(new PersistedRequest(getRequest(), LocalDateTime.now(), amount, base, desiredCurrencies));
+    }
+
+    public void saveRequestExternalService(String url) {
+        PersistedRequest persistedRequest = new PersistedRequest();
+        persistedRequest.setRequestUrl(url);
+        persistedRequest.setTimeCreated(LocalDateTime.now());
+        persistedRequestRepository.save(persistedRequest);
+    }
+
+    private String getRequest() {
         HttpServletRequest req =
                 ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()))
                         .getRequest();
@@ -33,20 +60,17 @@ public class UrlService {
 
         getParams(parameterMap, requestURL);
 
-        persistedRequestRepository.save(new PersistedRequest(requestURL.toString(), LocalDateTime.now()));
+        return requestURL.toString();
     }
 
-    public void saveRequest(String url) {
-        persistedRequestRepository.save(new PersistedRequest(url, LocalDateTime.now()));
-    }
-
-
-    public void getParams(Map<String, String[]> parameterMap, StringBuffer requestURL) {
+    private void getParams(Map<String, String[]> parameterMap, StringBuffer requestURL) {
         if (!parameterMap.isEmpty()) {
             requestURL.append("?");
             Iterator<Map.Entry<String, String[]>> iterator = parameterMap.entrySet().iterator();
+
             while (iterator.hasNext()){
                 Map.Entry<String, String[]> next = iterator.next();
+
                 requestURL.append(next.getKey());
                 requestURL.append("=");
                 requestURL.append(next.getValue()[VALUE]);
