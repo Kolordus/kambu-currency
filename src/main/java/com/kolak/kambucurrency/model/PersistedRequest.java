@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @Entity
@@ -29,15 +30,22 @@ public class PersistedRequest {
     @ElementCollection
     private Map<String, Double> desiredCurrencies;
 
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @ElementCollection
+    private List<String> invokedExternalApiUrls;
+
     public PersistedRequest() {
     }
 
-    public PersistedRequest(String requestUrl, LocalDateTime timeCreated, Double amount, String baseCurrency, Map<String, Double> desiredCurrencies) {
+    public PersistedRequest(String requestUrl, LocalDateTime timeCreated,
+                            Double amount, String baseCurrency,
+                            Map<String, Double> desiredCurrencies, List<String> invokedExternalApiUrls) {
         this.requestUrl = requestUrl;
         this.timeCreated = timeCreated;
         this.amount = amount;
         this.baseCurrency = baseCurrency;
         this.desiredCurrencies = desiredCurrencies;
+        this.invokedExternalApiUrls = invokedExternalApiUrls;
     }
 
     public Long getId() {
@@ -86,5 +94,13 @@ public class PersistedRequest {
 
     public void setDesiredCurrencies(Map<String, Double> desiredCurrencies) {
         this.desiredCurrencies = desiredCurrencies;
+    }
+
+    public List<String> getInvokedExternalApiUrls() {
+        return invokedExternalApiUrls;
+    }
+
+    public void setInvokedExternalApiUrls(List<String> invokedExternalApiUrls) {
+        this.invokedExternalApiUrls = invokedExternalApiUrls;
     }
 }

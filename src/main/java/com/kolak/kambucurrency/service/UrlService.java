@@ -10,6 +10,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -23,7 +24,6 @@ public class UrlService {
         this.persistedRequestRepository = persistedRequestRepository;
     }
 
-
     public void saveRequest() {
         PersistedRequest persistedRequest = new PersistedRequest();
         persistedRequest.setRequestUrl(getRequest());
@@ -31,23 +31,18 @@ public class UrlService {
         persistedRequestRepository.save(persistedRequest);
     }
 
-    public void saveRequest(String base, Map<String, Double> desiredCurrencies) {
+    public void saveRequest(String base, Map<String, Double> desiredCurrencies, List<String> invokedExternalApiUrls) {
         PersistedRequest persistedRequest = new PersistedRequest();
         persistedRequest.setRequestUrl(getRequest());
         persistedRequest.setBaseCurrency(base);
         persistedRequest.setTimeCreated(LocalDateTime.now());
+        persistedRequest.setDesiredCurrencies(desiredCurrencies);
+        persistedRequest.setInvokedExternalApiUrls(invokedExternalApiUrls);
         persistedRequestRepository.save(persistedRequest);
     }
 
-    public void saveRequest(Double amount, String base, Map<String, Double> desiredCurrencies) {
-        persistedRequestRepository.save(new PersistedRequest(getRequest(), LocalDateTime.now(), amount, base, desiredCurrencies));
-    }
-
-    public void saveRequestExternalService(String url) {
-        PersistedRequest persistedRequest = new PersistedRequest();
-        persistedRequest.setRequestUrl(url);
-        persistedRequest.setTimeCreated(LocalDateTime.now());
-        persistedRequestRepository.save(persistedRequest);
+    public void saveRequest(Double amount, String base, Map<String, Double> desiredCurrencies, List<String> invokedExternalApiUrls) {
+        persistedRequestRepository.save(new PersistedRequest(getRequest(), LocalDateTime.now(), amount, base, desiredCurrencies, invokedExternalApiUrls));
     }
 
     private String getRequest() {

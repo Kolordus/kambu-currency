@@ -1,6 +1,5 @@
 package com.kolak.kambucurrency.service;
 
-
 import com.kolak.kambucurrency.exception.AmountMustBePositiveException;
 import com.kolak.kambucurrency.exception.CurrencyNotSupportedException;
 import com.kolak.kambucurrency.model.Currency;
@@ -53,42 +52,49 @@ public class CurrencyService {
         if (amount < 1) {
             throw new AmountMustBePositiveException();
         }
-        double baseRate = getPlnRate(base);
-        double desiredBase = getPlnRate(desired);
+        LinkedList<String> invokedExternalApiUrls = new LinkedList<>();
+        double baseRate = getPlnRate(base, invokedExternalApiUrls);
+        double desiredBase = getPlnRate(desired, invokedExternalApiUrls);
         double converted = formatDouble((baseRate / desiredBase) * amount);
 
-        urlService.saveRequest(amount, base.toUpperCase(), Collections.singletonMap(desired.toUpperCase(), converted));
+        urlService.saveRequest(amount, base.toUpperCase(), Collections.singletonMap(desired.toUpperCase(), converted), invokedExternalApiUrls);
 
         return formatDouble(converted);
     }
 
     public Map<String, Double> getCurrencyRating(String base, List<String> currenciesList) {
         Map<String, Double> rates = new HashMap<>();
+        LinkedList<String> invokedExternalApiUrls = new LinkedList<>();
 
+        double gbpPlnRate = getPlnRate(base, invokedExternalApiUrls);
         if (currenciesList.isEmpty()) {
-            return getCurrencyRating(base, rates);
+            return getCurrencyRating(base, rates, invokedExternalApiUrls);
         }
+
 
         for (String currency : currenciesList) {
             rates.put(currency.toUpperCase(),
-                    formatDouble(getPlnRate(base) / getPlnRate(currency)));
+                    formatDouble( gbpPlnRate / getPlnRate(currency, invokedExternalApiUrls)));
         }
 
-        urlService.saveRequest(null, base.toUpperCase(), rates);
+        urlService.saveRequest(base.toUpperCase(), rates, invokedExternalApiUrls);
 
         return rates;
     }
 
-    private Map<String, Double> getCurrencyRating(String base, Map<String, Double> rates) {
+    private Map<String, Double> getCurrencyRating(String base, Map<String, Double> rates, List<String> invokedExternalApiUrls) {
+        double gbpPlnRate = getPlnRate(base, invokedExternalApiUrls);
         for (Currency currency : currencyRepository.findAll()) {
-            rates.put(currency.getCode().toUpperCase(), formatDouble(getPlnRate(base) / getPlnRate(currency.getCode())));
+            rates.put(currency.getCode().toUpperCase(),
+                    formatDouble( gbpPlnRate / getPlnRate(currency.getCode(), invokedExternalApiUrls)));
         }
-        urlService.saveRequest(base.toUpperCase(), rates);
+        urlService.saveRequest(base.toUpperCase(), rates, invokedExternalApiUrls);
 
         return rates;
     }
 
-    private double getPlnRate(String base) {
+
+    private double getPlnRate(String base, List<String> invokedExternalApiUrls) {
         if (repositoryDoesntContainCurrency(base)) {
             throw new CurrencyNotSupportedException(base);
         }
@@ -103,7 +109,7 @@ public class CurrencyService {
         double baseCurrencyMidRate = 0d;
 
         if (currencyDetails != null){
-            urlService.saveRequestExternalService(CURRENCY_API_URL + base + JSON_FORMAT);
+            invokedExternalApiUrls.add(CURRENCY_API_URL + base + JSON_FORMAT);
             return currencyDetails.getRates().get(MEDIUM_RATE).getMid();
         }
 

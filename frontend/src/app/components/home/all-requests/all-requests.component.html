@@ -7,6 +7,23 @@
       <p>{{rate.requestUrl}}</p>
       <h5>Time: </h5>
       <p>{{rate.timeCreated}}</p>
+
+      <h5 *ngIf="rate.amount">Amount:</h5>
+      <p>{{rate.amount}}</p>
+
+      <h5 *ngIf="rate.baseCurrency">Base currency: </h5>
+      <p>{{rate.baseCurrency}}</p>
+
+      <h5 *ngIf="rate.desiredCurrencies">Desired currencies:</h5>
+      <div *ngFor="let desired of rate.desiredCurrencies | keyvalue">
+        <p>{{desired.key}}: {{desired.value | number : '1.2-2'}}</p>
+      </div>
+
+      <h5 *ngIf="rate.invokedExternalApiUrls">Invoked External Api URLs</h5>
+      <div *ngFor="let url of rate.invokedExternalApiUrls">
+        <p>{{url}}</p>
+      </div>
+
     </div>
   </div>
 </div>
