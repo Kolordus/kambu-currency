@@ -35,3 +35,4 @@ build/
 testdbab.trace
 testdbab.mv.db
 mvnw.cmd
+/frontend/node_modules/

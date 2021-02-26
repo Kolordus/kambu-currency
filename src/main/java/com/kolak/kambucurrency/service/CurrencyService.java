@@ -6,7 +6,6 @@ import com.kolak.kambucurrency.model.Currency;
 import com.kolak.kambucurrency.model.PersistedRequest;
 import com.kolak.kambucurrency.model.nbpapi.CurrencyDetails;
 import com.kolak.kambucurrency.repository.CurrencyRepository;
-import com.kolak.kambucurrency.repository.PersistedRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -24,28 +23,26 @@ public class CurrencyService {
     private final static int MEDIUM_RATE = 0;
 
     private final RestTemplate restTemplate;
-    private final UrlService urlService;
+    private final PersistRequestService persistRequestService;
     private final CurrencyRepository currencyRepository;
-    private final PersistedRequestRepository persistedRequestRepository;
 
     @Autowired
-    public CurrencyService(RestTemplate restTemplate, UrlService urlService, CurrencyRepository currencyRepository, PersistedRequestRepository persistedRequestRepository) {
+    public CurrencyService(RestTemplate restTemplate, PersistRequestService persistRequestService,
+                           CurrencyRepository currencyRepository) {
         this.restTemplate = restTemplate;
-        this.urlService = urlService;
+        this.persistRequestService = persistRequestService;
         this.currencyRepository = currencyRepository;
-        this.persistedRequestRepository = persistedRequestRepository;
     }
 
     public List<String> getAllAvailableCurrencies() {
-        urlService.saveRequest();
+        persistRequestService.saveRequest();
         return currencyRepository.findAll().stream()
                 .map(Currency::getCode)
                 .collect(Collectors.toList());
     }
 
     public List<PersistedRequest> getAllPersistedRequests() {
-        urlService.saveRequest();
-        return persistedRequestRepository.findAll();
+        return persistRequestService.getAllPersistedRequests();
     }
 
     public double convert(Double amount, String base, String desired) {
@@ -57,7 +54,7 @@ public class CurrencyService {
         double desiredBase = getPlnRate(desired, invokedExternalApiUrls);
         double converted = formatDouble((baseRate / desiredBase) * amount);
 
-        urlService.saveRequest(amount, base.toUpperCase(), Collections.singletonMap(desired.toUpperCase(), converted), invokedExternalApiUrls);
+        persistRequestService.saveRequest(amount, base.toUpperCase(), Collections.singletonMap(desired.toUpperCase(), converted), invokedExternalApiUrls);
 
         return formatDouble(converted);
     }
@@ -77,7 +74,7 @@ public class CurrencyService {
                     formatDouble( gbpPlnRate / getPlnRate(currency, invokedExternalApiUrls)));
         }
 
-        urlService.saveRequest(base.toUpperCase(), rates, invokedExternalApiUrls);
+        persistRequestService.saveRequest(base.toUpperCase(), rates, invokedExternalApiUrls);
 
         return rates;
     }
@@ -88,7 +85,7 @@ public class CurrencyService {
             rates.put(currency.getCode().toUpperCase(),
                     formatDouble( gbpPlnRate / getPlnRate(currency.getCode(), invokedExternalApiUrls)));
         }
-        urlService.saveRequest(base.toUpperCase(), rates, invokedExternalApiUrls);
+        persistRequestService.saveRequest(base.toUpperCase(), rates, invokedExternalApiUrls);
 
         return rates;
     }

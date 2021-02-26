@@ -11,11 +11,10 @@ import {share} from 'rxjs/operators';
 export class ConvertComponent implements OnInit {
 
   availableCurrencies$: Observable<Array<string>>;
-  convertedValue$: Observable<number>;
-
   selectedBase: string;
   selectedDesired: string;
   amount: number;
+  result: string;
 
   constructor(private http: HttpService) {
   }
@@ -25,7 +24,9 @@ export class ConvertComponent implements OnInit {
   }
 
   convert(amount = 1, base = 'pln', desired = 'eur') {
-    this.convertedValue$ = this.http.convert(amount, base, desired).pipe(share());
+    this.http.convert(amount, base, desired).subscribe(value => {
+      this.result = amount + ' ' + base.toUpperCase() + ' is ' + value + ' ' + desired.toUpperCase();
+    });
   }
 
 

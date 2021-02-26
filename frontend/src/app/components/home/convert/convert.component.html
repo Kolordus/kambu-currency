@@ -3,9 +3,10 @@
 <div style="width: 30%; margin-top: 20px">
 
   <mat-label>Amount</mat-label>
+  <label>Amount</label>
   <input matInput placeholder="1" value="1" [(ngModel)]="amount">
 
-<hr>
+  <hr>
   <mat-label style="margin-bottom: 10px">Pick base currency</mat-label>
   <mat-select [(ngModel)]="selectedBase" placeholder="PLN">
     <mat-option *ngFor="let currency of availableCurrencies$ | async" [value]="currency" >
@@ -29,4 +30,4 @@
 
 
 <h2 style="margin-top: 40px">Result:</h2>
-<h3>{{this.convertedValue$ | async}}</h3>
+{{this.result}}

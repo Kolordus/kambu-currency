@@ -1,10 +1,11 @@
 package com.kolak.kambucurrency.service;
 
+import com.kolak.kambucurrency.exception.AmountMustBePositiveException;
+import com.kolak.kambucurrency.exception.CurrencyNotSupportedException;
 import com.kolak.kambucurrency.model.Currency;
 import com.kolak.kambucurrency.model.nbpapi.CurrencyDetails;
 import com.kolak.kambucurrency.model.nbpapi.Rate;
 import com.kolak.kambucurrency.repository.CurrencyRepository;
-import com.kolak.kambucurrency.repository.PersistedRequestRepository;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +30,8 @@ class CurrencyServiceTest {
     @Mock CurrencyRepository currencyRepository;
 
     @Mock RestTemplate restTemplate;
+
+    @Mock PersistRequestService persistRequestService;
 
     @InjectMocks
     CurrencyService currencyService;
@@ -75,6 +78,26 @@ class CurrencyServiceTest {
 
         // then
         Assert.assertEquals(excepted, convert, 0.0);
+    }
+
+    @Test()
+    public void shouldThrowAmountMustBePositiveException() {
+        double amount = 0;
+        // then
+
+        Assert.assertThrows(AmountMustBePositiveException.class,
+                () -> currencyService.convert(amount, "EUR", "AUD"));
+
+    }
+
+    @Test()
+    public void shouldThrowAmountMustBePositiveException1() {
+        double amount = -1;
+        // then
+
+        Assert.assertThrows(AmountMustBePositiveException.class,
+                () -> currencyService.convert(amount, "EUR", "AUD"));
+
     }
 
     @Test
@@ -154,6 +177,18 @@ class CurrencyServiceTest {
 
         Assert.assertFalse(currencyRating.isEmpty());
         Assert.assertEquals(currenciesList.size(), currencyRating.size());
+
+    }
+
+    @Test
+    public void shouldThrowCurrencyNotSupportedException() {
+        // given
+        String base = "GBPD";
+        List<String> currenciesList = Arrays.asList("EUR", "AUD");
+
+        // then
+        Assert.assertThrows(CurrencyNotSupportedException.class,
+                () -> currencyService.getCurrencyRating(base, currenciesList));
 
     }
 

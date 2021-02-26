@@ -2,7 +2,6 @@ package com.kolak.kambucurrency.service;
 
 import com.kolak.kambucurrency.model.PersistedRequest;
 import com.kolak.kambucurrency.repository.PersistedRequestRepository;
-import org.apache.tomcat.jni.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -15,13 +14,18 @@ import java.util.Map;
 import java.util.Objects;
 
 @Service
-public class UrlService {
+public class PersistRequestService {
 
     private final static int VALUE = 0;
     private final PersistedRequestRepository persistedRequestRepository;
 
-    public UrlService(PersistedRequestRepository persistedRequestRepository) {
+    public PersistRequestService(PersistedRequestRepository persistedRequestRepository) {
         this.persistedRequestRepository = persistedRequestRepository;
+    }
+
+    public List<PersistedRequest> getAllPersistedRequests() {
+        this.saveRequest();
+        return persistedRequestRepository.findAll();
     }
 
     public void saveRequest() {

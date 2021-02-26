@@ -6,5 +6,7 @@ create table currency (
 create table persisted_request(
     id serial primary key,
     request_url varchar (255),
-    time_created timestamp
+    time_created timestamp,
+    amount real,
+    base_currency varchar (3)
 );
