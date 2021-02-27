@@ -1,0 +1,29 @@
+
+
+<mat-label style="margin-bottom: 10px">Pick base currency</mat-label>
+<mat-select [(ngModel)]="baseCurrency" placeholder="PLN">
+  <mat-option *ngFor="let currency of availableCurrencies$ | async" [value]="currency" >
+    {{currency}}
+  </mat-option>
+</mat-select>
+
+<mat-label style="margin-bottom: 10px">Pick desired currencies</mat-label>
+<mat-select multiple [(ngModel)]="desiredCurrencies" placeholder="select">
+  <mat-option *ngFor="let currency of availableCurrencies$ | async" [value]="currency" >
+    {{currency}}
+  </mat-option>
+</mat-select>
+
+
+<button mat-raised-button color="accent" (click)="getRates()" class="btn btn-success" style="margin-top: 30px">convert values</button>
+
+
+<h2 style="margin-top: 40px">Result:</h2>
+
+<div style="background-color: darkgrey; border-radius: 10px">
+  <div *ngFor="let rate of rates$ | async | keyvalue" style="margin-left: 10px">
+    <p>{{rate.key}}: {{rate.value}}</p>
+  </div>
+</div>
+
+

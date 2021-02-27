@@ -33,7 +33,8 @@ public class PersistRequestService {
         return persistedRequestRepository.save(persistedRequest);
     }
 
-    public PersistedRequest saveRequest(String base, Map<String, Double> desiredCurrencies, List<String> invokedExternalApiUrls) {
+    public PersistedRequest saveRequest(String base, Map<String,
+                                Double> desiredCurrencies, List<String> invokedExternalApiUrls) {
         PersistedRequest persistedRequest = new PersistedRequest();
         persistedRequest.setRequestUrl(getRequest());
         persistedRequest.setBaseCurrency(base);
@@ -43,8 +44,12 @@ public class PersistRequestService {
         return persistedRequestRepository.save(persistedRequest);
     }
 
-    public PersistedRequest saveRequest(Double amount, String base, Map<String, Double> desiredCurrencies, List<String> invokedExternalApiUrls) {
-        return persistedRequestRepository.save(new PersistedRequest(getRequest(), LocalDateTime.now(), amount, base, desiredCurrencies, invokedExternalApiUrls));
+    public PersistedRequest saveRequest(Double amount, String base,
+                                        Map<String, Double> desiredCurrencies, List<String> invokedExternalApiUrls) {
+        return persistedRequestRepository.save(
+                new PersistedRequest(getRequest(), LocalDateTime.now(), amount,
+                        base, desiredCurrencies, invokedExternalApiUrls)
+        );
     }
 
     public PersistedRequest saveRequestWithError(String exceptionName) {
@@ -56,11 +61,15 @@ public class PersistRequestService {
         return persistedRequestRepository.save(persistedRequest);
     }
 
-    private String getRequest() {
-        HttpServletRequest req =
-                ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()))
-                        .getRequest();
 
+    private String getRequest() {
+        if (RequestContextHolder.getRequestAttributes() == null) {
+            return "";
+        }
+
+        HttpServletRequest req =
+                ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+                        .getRequest();
 
         if (req.getQueryString() == null) {
             return req.getRequestURL().toString();

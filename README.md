@@ -175,7 +175,7 @@ In order to run frontend locally (not using docker-compose, or frontend app woul
 3. then 
 
     ```
-        ng serve
+        npm start
     ```
 From now on GUI is available at
  

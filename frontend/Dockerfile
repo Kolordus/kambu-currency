@@ -3,7 +3,7 @@ WORKDIR /usr/src/app
 COPY package.json ./
 RUN npm install
 COPY . .
-RUN npm run
+RUN npm run start
 
 FROM nginx:alpine
 COPY --from=build /usr/src/app/ /usr/share/nginx/html

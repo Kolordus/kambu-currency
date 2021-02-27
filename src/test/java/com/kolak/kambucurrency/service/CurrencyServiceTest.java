@@ -32,7 +32,6 @@ class CurrencyServiceTest {
 
     @Mock RestTemplate restTemplate;
 
-    @Mock PersistRequestService persistRequestService;
 
     @InjectMocks
     CurrencyService currencyService;
@@ -51,10 +50,10 @@ class CurrencyServiceTest {
 
         // when
         double convert = currencyService.convert(amount, "GBP", "PLN");
-        double excepted = gbpRate * amount;
+        double expected = gbpRate * amount;
 
         // then
-        Assert.assertEquals(excepted, convert, 0.0);
+        Assert.assertEquals(expected, convert, 0.0);
     }
 
     @Test
@@ -75,10 +74,10 @@ class CurrencyServiceTest {
 
         // when
         double convert = currencyService.convert(amount, "EUR", "AUD");
-        double excepted = formatDouble((eurRate / audRate) * amount);
+        double expected = formatDouble((eurRate / audRate) * amount);
 
         // then
-        Assert.assertEquals(excepted, convert, 0.0);
+        Assert.assertEquals(expected, convert, 0.0);
     }
 
     @Test()

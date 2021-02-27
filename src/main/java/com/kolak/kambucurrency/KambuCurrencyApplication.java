@@ -5,6 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletRequest;
+
 @SpringBootApplication
 public class KambuCurrencyApplication {
 
@@ -17,4 +19,6 @@ public class KambuCurrencyApplication {
     public RestTemplate getRestTemplate() {
         return new RestTemplate();
     }
+
+
 }

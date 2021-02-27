@@ -1,0 +1,16 @@
+
+<body>
+  <div class="container">
+    <div id="buttonsDiv">
+      <h2> </h2>
+      <button mat-raised-button color="accent" (click)="showRated()" class="btn btn-success">Convert</button>
+        <button mat-raised-button color="accent" (click)="showUnrated()" class="btn btn-success">Get Rates</button>
+        <button mat-raised-button color="accent" (click)="showAllRequests()" class="btn btn-success">Show all persisted Requests</button>
+    </div>
+    <hr>
+    <div id="border"> </div>
+
+    <router-outlet></router-outlet>
+  </div>
+</body>
+
