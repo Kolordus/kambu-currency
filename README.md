@@ -50,10 +50,10 @@ JSON response:
 #### 2. /convert
 
     
-        curl -X GET "http://localhost:8080/api/convert" \
-        -d amount=1 \
-        -d base=PLN \
-        -d desired=EUR
+        curl -X GET "http://localhost:8080/api/convert?" \
+            &amount=1 \
+            &base=PLN \
+            &desired=EUR
         
         
 Takes 3 parameters: amount (number), base (string), desired (string)
@@ -114,9 +114,9 @@ Example response JSON:
 #### 4./rates
 
  ```
- curl -X GET "http://localhost:8080/api/rates" \
-         -d base=PLN \
-         -d currencies=EUR,GBP
+ curl -X GET "http://localhost:8080/api/rates?" \
+          &base=PLN \
+          &currencies=EUR,GBP
  ```
 
 Takes 2 parameters: base (string) and currencies (array of strings).
