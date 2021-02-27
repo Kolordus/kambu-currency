@@ -9,13 +9,13 @@
       <p>{{rate.timeCreated}}</p>
 
       <h5 *ngIf="rate.amount">Amount:</h5>
-      <p>{{rate.amount}}</p>
+      <p>{{rate.amount | number: '1.2-2' }}</p>
 
       <h5 *ngIf="rate.baseCurrency">Base currency: </h5>
       <p>{{rate.baseCurrency}}</p>
 
-      <h5 *ngIf="rate.desiredCurrencies">Desired currencies:</h5>
-      <div *ngFor="let desired of rate.desiredCurrencies | keyvalue">
+      <h5 *ngIf="rate.desiredCurrenciesResponse">Desired currencies:</h5>
+      <div *ngFor="let desired of rate.desiredCurrenciesResponse | keyvalue">
         <p>{{desired.key}}: {{desired.value | number : '1.2-2'}}</p>
       </div>
 
@@ -23,6 +23,11 @@
       <div *ngFor="let url of rate.invokedExternalApiUrls">
         <p>{{url}}</p>
       </div>
+
+
+      <h5 *ngIf="rate.exceptionName">Exception name:</h5>
+        <p>{{rate.exceptionName}}</p>
+
 
     </div>
   </div>

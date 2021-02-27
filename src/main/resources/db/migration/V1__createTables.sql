@@ -8,5 +8,6 @@ create table persisted_request(
     request_url varchar (255),
     time_created timestamp,
     amount real,
-    base_currency varchar (3)
+    base_currency varchar (3),
+    exception_name varchar (255)
 );

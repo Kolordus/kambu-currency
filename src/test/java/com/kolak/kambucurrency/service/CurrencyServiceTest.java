@@ -6,6 +6,7 @@ import com.kolak.kambucurrency.model.Currency;
 import com.kolak.kambucurrency.model.nbpapi.CurrencyDetails;
 import com.kolak.kambucurrency.model.nbpapi.Rate;
 import com.kolak.kambucurrency.repository.CurrencyRepository;
+import org.assertj.core.util.Lists;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -125,10 +126,12 @@ class CurrencyServiceTest {
 
         // then
         double expectedGbpToEur = formatDouble(gbpRate / eurRate);
+        double expectedGbpToAud = formatDouble(gbpRate / audRate);
 
         Assert.assertFalse(currencyRating.isEmpty());
         Assert.assertEquals(currenciesList.size(), currencyRating.size());
         Assert.assertEquals(expectedGbpToEur, currencyRating.get("EUR"), 0.0);
+        Assert.assertEquals(expectedGbpToAud, currencyRating.get("AUD"), 0.0);
     }
 
     @Test
@@ -136,7 +139,7 @@ class CurrencyServiceTest {
         // given
         String base = "GBP";
 
-        List<String> currenciesList = Arrays.asList("EUR", "AUD", "GBP", "JPY", "HUF");
+        List<String> currenciesList = Lists.emptyList();
         double eurRate = 1.5;
         double audRate = 1.4;
         double gbpRate = 1.0;
@@ -176,7 +179,7 @@ class CurrencyServiceTest {
         Assert.assertEquals(expectedGbpToHuf, currencyRating.get("HUF"), 0.0);
 
         Assert.assertFalse(currencyRating.isEmpty());
-        Assert.assertEquals(currenciesList.size(), currencyRating.size());
+        Assert.assertEquals(createCurrenciesList().size(), currencyRating.size());
 
     }
 

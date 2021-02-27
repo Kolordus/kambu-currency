@@ -40,7 +40,8 @@ export interface PersistedRequest {
   timeCreated: Date;
   amount?: number;
   baseCurrency?: string;
-  desiredCurrencies?: Map<string, number>;
+  exceptionName?: string;
+  desiredCurrenciesResponse?: Map<string, number>;
   invokedExternalApiUrls?: Array<string>;
 }
 

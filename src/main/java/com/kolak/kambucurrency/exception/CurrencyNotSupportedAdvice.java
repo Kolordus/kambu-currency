@@ -15,7 +15,7 @@ public class CurrencyNotSupportedAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler(CurrencyNotSupportedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Object> handleCurrencyNotSupported(CurrencyNotSupportedException e, WebRequest webRequest) {
-        e.printStackTrace();
+//        e.printStackTrace();
         return handleExceptionInternal(e, e.getMessage(), HttpHeaders.EMPTY, HttpStatus.BAD_REQUEST, webRequest);
     }
 

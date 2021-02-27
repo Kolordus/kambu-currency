@@ -8,7 +8,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -16,7 +15,6 @@ import java.util.Objects;
 @Service
 public class PersistRequestService {
 
-    private final static int VALUE = 0;
     private final PersistedRequestRepository persistedRequestRepository;
 
     public PersistRequestService(PersistedRequestRepository persistedRequestRepository) {
@@ -24,29 +22,38 @@ public class PersistRequestService {
     }
 
     public List<PersistedRequest> getAllPersistedRequests() {
-        this.saveRequest();
+        saveRequest();
         return persistedRequestRepository.findAll();
     }
 
-    public void saveRequest() {
+    public PersistedRequest saveRequest() {
         PersistedRequest persistedRequest = new PersistedRequest();
         persistedRequest.setRequestUrl(getRequest());
         persistedRequest.setTimeCreated(LocalDateTime.now());
-        persistedRequestRepository.save(persistedRequest);
+        return persistedRequestRepository.save(persistedRequest);
     }
 
-    public void saveRequest(String base, Map<String, Double> desiredCurrencies, List<String> invokedExternalApiUrls) {
+    public PersistedRequest saveRequest(String base, Map<String, Double> desiredCurrencies, List<String> invokedExternalApiUrls) {
         PersistedRequest persistedRequest = new PersistedRequest();
         persistedRequest.setRequestUrl(getRequest());
         persistedRequest.setBaseCurrency(base);
         persistedRequest.setTimeCreated(LocalDateTime.now());
-        persistedRequest.setDesiredCurrencies(desiredCurrencies);
+        persistedRequest.setDesiredCurrenciesResponse(desiredCurrencies);
         persistedRequest.setInvokedExternalApiUrls(invokedExternalApiUrls);
-        persistedRequestRepository.save(persistedRequest);
+        return persistedRequestRepository.save(persistedRequest);
     }
 
-    public void saveRequest(Double amount, String base, Map<String, Double> desiredCurrencies, List<String> invokedExternalApiUrls) {
-        persistedRequestRepository.save(new PersistedRequest(getRequest(), LocalDateTime.now(), amount, base, desiredCurrencies, invokedExternalApiUrls));
+    public PersistedRequest saveRequest(Double amount, String base, Map<String, Double> desiredCurrencies, List<String> invokedExternalApiUrls) {
+        return persistedRequestRepository.save(new PersistedRequest(getRequest(), LocalDateTime.now(), amount, base, desiredCurrencies, invokedExternalApiUrls));
+    }
+
+    public PersistedRequest saveRequestWithError(String exceptionName) {
+        PersistedRequest persistedRequest = new PersistedRequest();
+        persistedRequest.setRequestUrl(getRequest());
+        persistedRequest.setTimeCreated(LocalDateTime.now());
+        persistedRequest.setExceptionName(exceptionName);
+
+        return persistedRequestRepository.save(persistedRequest);
     }
 
     private String getRequest() {
@@ -54,30 +61,12 @@ public class PersistRequestService {
                 ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()))
                         .getRequest();
 
-        StringBuffer requestURL = req.getRequestURL();
-        Map<String, String[]> parameterMap = req.getParameterMap();
 
-        getParams(parameterMap, requestURL);
-
-        return requestURL.toString();
-    }
-
-    private void getParams(Map<String, String[]> parameterMap, StringBuffer requestURL) {
-        if (!parameterMap.isEmpty()) {
-            requestURL.append("?");
-            Iterator<Map.Entry<String, String[]>> iterator = parameterMap.entrySet().iterator();
-
-            while (iterator.hasNext()){
-                Map.Entry<String, String[]> next = iterator.next();
-
-                requestURL.append(next.getKey());
-                requestURL.append("=");
-                requestURL.append(next.getValue()[VALUE]);
-
-                if (iterator.hasNext())
-                    requestURL.append("&");
-            }
+        if (req.getQueryString() == null) {
+            return req.getRequestURL().toString();
         }
+
+        return req.getRequestURL() + "?" + req.getQueryString();
     }
 
 }

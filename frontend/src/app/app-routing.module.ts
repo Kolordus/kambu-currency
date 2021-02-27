@@ -8,20 +8,27 @@ import {AllRequestsComponent} from './components/home/all-requests/all-requests.
 
 
 export const routes: Routes = [
-  {path: 'home', component: HomeComponent,
-    children: [
-      {path: 'convert', component: ConvertComponent},
-      {path: 'get-rates', component: GetRatesComponent},
-      {path: 'all-requests', component: AllRequestsComponent}
-    ]},
-  {path: '**', component: NotFoundComponent}
-];
+    {path: '', redirectTo: 'home', pathMatch: 'full'},
+    {
+      path: 'home',
+      component: HomeComponent,
+      children: [
+        {path: 'convert', component: ConvertComponent},
+        {path: 'get-rates', component: GetRatesComponent},
+        {path: 'all-requests', component: AllRequestsComponent}
+      ]
+    }
+    ,
+    {path: '**', component: NotFoundComponent}
+  ]
+;
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {
+}
 
 export const routingComponents = [
   HomeComponent,

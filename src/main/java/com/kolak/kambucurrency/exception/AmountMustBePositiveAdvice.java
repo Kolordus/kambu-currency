@@ -15,7 +15,7 @@ public class AmountMustBePositiveAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler(AmountMustBePositiveException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Object> handleAmountMustBePositive(AmountMustBePositiveException e, WebRequest webRequest) {
-        e.printStackTrace();
+//        e.printStackTrace();
         return handleExceptionInternal(e, e.getMessage(), HttpHeaders.EMPTY, HttpStatus.BAD_REQUEST, webRequest);
     }
 

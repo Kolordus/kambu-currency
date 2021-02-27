@@ -26,8 +26,8 @@ public class CurrencyController {
     }
 
     @GetMapping("/all-requests")
-    public List<PersistedRequest> getAllRequests() {
-        return currencyService.getAllPersistedRequests();
+    public ResponseEntity<List<PersistedRequest>> getAllRequests() {
+        return ResponseEntity.ok(currencyService.getAllPersistedRequests());
     }
 
     @GetMapping("/convert")

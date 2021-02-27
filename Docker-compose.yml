@@ -1,42 +1,41 @@
-# Docker Compose file Reference (https://docs.docker.com/compose/compose-file/)
-version: '3'
+  file Reference (https://docs.docker.com/compose/compose-file/)
+  version: '3'
 
-services:
+  services:
 
-  #PostgreSQL
-  db:
-    image: 'postgres:13.1-alpine'
-    container_name: db
-    ports:
-      - 5432:5432
-    environment:
-      - POSTGRES_DB=currconv
-      - POSTGRES_USER=kambu
-      - POSTGRES_PASSWORD=kambu123@
+    #PostgreSQL
+    db:
+      image: 'postgres:13.1-alpine'
+      container_name: db
+      ports:
+        - 5432:5432
+      environment:
+        - POSTGRES_DB=currconv
+        - POSTGRES_USER=kambu
+        - POSTGRES_PASSWORD=kambu123@
 
 
-  #Spring Boot
-  currency-app:
-#    build: ./Dockerfile
-    build:
-      context: .
-    container_name: currency-app
-    depends_on:
-      - db
+    #Spring Boot
+    currency-app:
+      #    build: ./Dockerfile
+      build:
+        context: .
+      container_name: currency-app
+      depends_on:
+        - db
 
-    environment:
-      - spring.profiles.active=prod
-    ports:
-      - 8080:8080
-    links:
-      - currency-postgres
+      environment:
+        - spring.profiles.active=prod
+      ports:
+        - 8080:8080
+      links:
+        - db
 
-  #Angular
-  currency-frontend:
-    build: ./frontend
-    container_name: currency-frontend
-    ports:
-      - 4200:80
-    links:
-      - currency-app
-
+    #Angular
+    currency-frontend:
+      build: ./frontend
+      container_name: currency-frontend
+      ports:
+        - 4200:80
+      links:
+        - currency-app

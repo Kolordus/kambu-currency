@@ -9,7 +9,11 @@ import com.kolak.kambucurrency.repository.CurrencyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.context.support.HttpRequestHandlerServlet;
 
+import javax.servlet.http.HttpServletRequest;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.*;
@@ -46,9 +50,12 @@ public class CurrencyService {
     }
 
     public double convert(Double amount, String base, String desired) {
-        if (amount < 1) {
-            throw new AmountMustBePositiveException();
+        if (amount <= 0) {
+            AmountMustBePositiveException exception = new AmountMustBePositiveException();
+            persistRequestService.saveRequestWithError(exception.getMessage());
+            throw exception;
         }
+
         LinkedList<String> invokedExternalApiUrls = new LinkedList<>();
         double baseRate = getPlnRate(base, invokedExternalApiUrls);
         double desiredBase = getPlnRate(desired, invokedExternalApiUrls);
@@ -63,15 +70,14 @@ public class CurrencyService {
         Map<String, Double> rates = new HashMap<>();
         LinkedList<String> invokedExternalApiUrls = new LinkedList<>();
 
-        double gbpPlnRate = getPlnRate(base, invokedExternalApiUrls);
+        double baseToPln = getPlnRate(base, invokedExternalApiUrls);
         if (currenciesList.isEmpty()) {
             return getCurrencyRating(base, rates, invokedExternalApiUrls);
         }
 
-
         for (String currency : currenciesList) {
             rates.put(currency.toUpperCase(),
-                    formatDouble( gbpPlnRate / getPlnRate(currency, invokedExternalApiUrls)));
+                    formatDouble( baseToPln / getPlnRate(currency, invokedExternalApiUrls)));
         }
 
         persistRequestService.saveRequest(base.toUpperCase(), rates, invokedExternalApiUrls);
@@ -93,7 +99,9 @@ public class CurrencyService {
 
     private double getPlnRate(String base, List<String> invokedExternalApiUrls) {
         if (repositoryDoesntContainCurrency(base)) {
-            throw new CurrencyNotSupportedException(base);
+            CurrencyNotSupportedException exception = new CurrencyNotSupportedException(base);
+            persistRequestService.saveRequestWithError(exception.getMessage());
+            throw exception;
         }
 
         if (base.toUpperCase().equals("PLN")) {

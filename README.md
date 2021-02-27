@@ -1,5 +1,22 @@
 # Currency App
 
+## Docker Compose
+
+Start terminal in main directory - You can easily find it by presence of file named
+
+```
+Docker-compose.yml
+```
+
+and then perform command 
+
+```$xslt
+docker-compose up
+```
+
+Three container will be built and run - database, backend app and frontend app.
+
+
 ## REST API
 
 Rest API provides 4 endpoints preceded by
@@ -10,7 +27,7 @@ Rest API provides 4 endpoints preceded by
 #### 1. /get-all-available
 
 ```
-    curl -X GET "http://localhost:8080/api/get-all-available-currencies"
+    curl -X GET "http://localhost:8080/api/all-available-currencies"
 ```
 This endpoint returns list of strings with codes of supported currencies.
 
@@ -50,7 +67,17 @@ if amount is not a positive number it throws an exception (AmountMustBePositive 
 
 Returned value is of type double.
     
-    
+Example request:
+
+```$xslt
+http://localhost:8080/api/convert?amount=1234&base=usd&desired=eur
+```
+
+JSON response:
+
+```
+1017.44
+```
 
 #### 3. /all-requests
 
@@ -107,12 +134,38 @@ Example response JSON:
        "USD": 0.27
    }
 ```
+## Profiles
+
+Application has prepared 3 profiles: local, test and prod.
+You can switch between them in 
+
+```
+   application.properties
+```
+
+changing line
+
+```
+spring.profiles.active=local
+```
+
+to desired profile. All the differences are in used databases.
+
+#### local
+uses built-in H2 Database
+
+#### test
+uses PostgreSQL installed on host machine (in order to launch app on this profile, You have to prepare database in psql, credentials are stored in application-test.properties)
+
+#### prod
+takes advantage of Docker and PostgreSQL container - if You going for containers make sure this is active profile.
+
 
 ## GUI
 
-In order to run frontend locally perform these steps:
+In order to run frontend locally (not using docker-compose, or frontend app would't load) perform these steps:
 
-1. Ensure that the Spring Boot application is on (with profile local)
+1. Ensure that the Spring Boot application is on
 2. Open frontend folder in terminal and execute command
 
     ```
