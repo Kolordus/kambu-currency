@@ -16,25 +16,31 @@ services:
 
   #Spring Boot
   currency-app:
-    #    build: ./Dockerfile
     build:
       context: .
-    container_name: currency-app
     depends_on:
       - db
-
     environment:
       - spring.profiles.active=prod
     ports:
-      - 8080:8080
+      - "8080"
     links:
       - db
 
   #Angular
-#  currency-frontend:
-#    build: ./frontend
-#    container_name: currency-frontend
-#    ports:
-#      - 4200:80
-#    links:
-#      - currency-app
+  currency-frontend:
+    build: ./frontend
+    container_name: currency-frontend
+    ports:
+      - 4200:80
+    links:
+      - currency-app
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - currency-app
+    ports:
+      - 8080:8080

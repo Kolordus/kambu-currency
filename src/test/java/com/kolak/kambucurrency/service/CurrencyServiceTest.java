@@ -8,6 +8,7 @@ import com.kolak.kambucurrency.model.nbpapi.Rate;
 import com.kolak.kambucurrency.repository.CurrencyRepository;
 import org.assertj.core.util.Lists;
 import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,6 +33,8 @@ class CurrencyServiceTest {
 
     @Mock RestTemplate restTemplate;
 
+    @Mock PersistRequestService persistRequestService;
+
 
     @InjectMocks
     CurrencyService currencyService;
@@ -53,7 +56,7 @@ class CurrencyServiceTest {
         double expected = gbpRate * amount;
 
         // then
-        Assert.assertEquals(expected, convert, 0.0);
+        Assertions.assertEquals(expected, convert, 0.0);
     }
 
     @Test
@@ -77,7 +80,7 @@ class CurrencyServiceTest {
         double expected = formatDouble((eurRate / audRate) * amount);
 
         // then
-        Assert.assertEquals(expected, convert, 0.0);
+        Assertions.assertEquals(expected, convert, 0.0);
     }
 
     @Test()
@@ -127,10 +130,10 @@ class CurrencyServiceTest {
         double expectedGbpToEur = formatDouble(gbpRate / eurRate);
         double expectedGbpToAud = formatDouble(gbpRate / audRate);
 
-        Assert.assertFalse(currencyRating.isEmpty());
-        Assert.assertEquals(currenciesList.size(), currencyRating.size());
-        Assert.assertEquals(expectedGbpToEur, currencyRating.get("EUR"), 0.0);
-        Assert.assertEquals(expectedGbpToAud, currencyRating.get("AUD"), 0.0);
+        Assertions.assertFalse(currencyRating.isEmpty());
+        Assertions.assertEquals(currenciesList.size(), currencyRating.size());
+        Assertions.assertEquals(expectedGbpToEur, currencyRating.get("EUR"), 0.0);
+        Assertions.assertEquals(expectedGbpToAud, currencyRating.get("AUD"), 0.0);
     }
 
     @Test
@@ -171,14 +174,14 @@ class CurrencyServiceTest {
         double expectedGbpToJpy = formatDouble(gbpRate / jpyRate);
         double expectedGbpToHuf = formatDouble(gbpRate / hufRate);
 
-        Assert.assertEquals(expectedGbpToEur, currencyRating.get("EUR"), 0.0);
-        Assert.assertEquals(expectedGbpToGbp, currencyRating.get("GBP"), 0.0);
-        Assert.assertEquals(expectedGbpToAud, currencyRating.get("AUD"), 0.0);
-        Assert.assertEquals(expectedGbpToJpy, currencyRating.get("JPY"), 0.0);
-        Assert.assertEquals(expectedGbpToHuf, currencyRating.get("HUF"), 0.0);
+        Assertions.assertEquals(expectedGbpToEur, currencyRating.get("EUR"), 0.0);
+        Assertions.assertEquals(expectedGbpToGbp, currencyRating.get("GBP"), 0.0);
+        Assertions.assertEquals(expectedGbpToAud, currencyRating.get("AUD"), 0.0);
+        Assertions.assertEquals(expectedGbpToJpy, currencyRating.get("JPY"), 0.0);
+        Assertions.assertEquals(expectedGbpToHuf, currencyRating.get("HUF"), 0.0);
 
-        Assert.assertFalse(currencyRating.isEmpty());
-        Assert.assertEquals(createCurrenciesList().size(), currencyRating.size());
+        Assertions.assertFalse(currencyRating.isEmpty());
+        Assertions.assertEquals(createCurrenciesList().size(), currencyRating.size());
 
     }
 

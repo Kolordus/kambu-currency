@@ -10,6 +10,7 @@ import {MatInputModule} from '@angular/material/input';
 import {AllRequestsComponent} from './components/home/all-requests/all-requests.component';
 import {MatSelectModule} from '@angular/material/select';
 import {MatButtonModule} from '@angular/material';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import {MatButtonModule} from '@angular/material';
     FormsModule,
     HttpClientModule,
     BrowserModule,
+    BrowserAnimationsModule,
     MatInputModule,
     MatSelectModule
   ],

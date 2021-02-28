@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/api")
 public class CurrencyController {
 
@@ -42,5 +42,6 @@ public class CurrencyController {
                                                                          @RequestParam(required = false, defaultValue = "") String[] currencies) {
         return ResponseEntity.ok(currencyService.getCurrencyRating(base, Arrays.asList(currencies)));
     }
+
 
 }

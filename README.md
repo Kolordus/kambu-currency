@@ -11,10 +11,22 @@ Docker-compose.yml
 and then perform command 
 
 ```$xslt
-docker-compose up
+docker-compose up --scale currency-app=3
 ```
 
-Three container will be built and run - database, backend app and frontend app.
+Four container will be built - database, backend app, frontend app and load balancer.
+
+Due to ```--scale``` parameter there will be 3 instantiated containers of Spring Boot app which are load balanced by nginx.
+
+Backend is reached from
+```
+http://localhost:8080/api
+```
+and frontend is at: 
+
+```
+http://localhost:4200
+```
 
 
 ## REST API
@@ -159,24 +171,3 @@ uses PostgreSQL installed on host machine (in order to launch app on this profil
 
 #### prod
 takes advantage of Docker and PostgreSQL container - if You going for containers make sure this is active profile.
-
-
-## GUI
-
-In order to run frontend locally (not using docker-compose, or frontend app would't load) perform these steps:
-
-1. Ensure that the Spring Boot application is on
-2. Open frontend folder in terminal and execute command
-
-    ```
-        npm install
-    ```
-
-3. then 
-
-    ```
-        npm start
-    ```
-From now on GUI is available at
- 
-http://localhost:4200/home
