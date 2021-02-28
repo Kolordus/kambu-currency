@@ -14,13 +14,13 @@ and then perform command
 docker-compose up --scale currency-app=3
 ```
 
-Four container will be built - database, backend app, frontend app and load balancer.
+Six containers will be running: database, frontend app, load balancer and 3 containers with backend app.
 
-Due to ```--scale``` parameter there will be 3 instantiated containers of Spring Boot app which are load balanced by nginx.
+Backend apps are load balanced by load balancer container.
 
 Backend is reached from
 ```
-http://localhost:8080/api
+http://localhost:8080
 ```
 and frontend is at: 
 
@@ -39,7 +39,7 @@ Rest API provides 4 endpoints preceded by
 #### 1. /get-all-available
 
 ```
-    curl -X GET "http://localhost:8080/api/all-available-currencies"
+    curl -X GET http://localhost:8080/api/all-available-currencies
 ```
 This endpoint returns list of strings with codes of supported currencies.
 
@@ -61,10 +61,9 @@ JSON response:
     
 #### 2. /convert
 
-    
-        curl -X GET "http://localhost:8080/api/convert?" \
-            &amount=1 \
-            &base=PLN \
+        curl -X GET http://localhost:8080/api/convert? 
+            &amount=1 
+            &base=PLN 
             &desired=EUR
         
         
@@ -94,7 +93,7 @@ JSON response:
 #### 3. /all-requests
 
  ```
- curl -X GET "http://localhost:8080/api/all-requests"
+ curl -X GET http://localhost:8080/api/all-requests
  ```
 
 Returns all api (from this API and external) requests persisted in the database.
@@ -126,8 +125,8 @@ Example response JSON:
 #### 4./rates
 
  ```
- curl -X GET "http://localhost:8080/api/rates?" \
-          &base=PLN \
+ curl -X GET http://localhost:8080/api/rates?
+          &base=PLN 
           &currencies=EUR,GBP
  ```
 
@@ -164,10 +163,11 @@ spring.profiles.active=local
 to desired profile. All the differences are in used databases.
 
 #### local
-uses built-in H2 Database
+uses built-in H2 Database.
+Best for local build of the application - using IDE run Spring Boot app and then in console start frontend from ```frontend``` folder and perform ```npm install``` and then ```npm start```. Rest API is reached from ```localhost:8080```, frontend from ```localhost:4200```
 
 #### test
-uses PostgreSQL installed on host machine (in order to launch app on this profile, You have to prepare database in psql, credentials are stored in application-test.properties)
+uses PostgreSQL installed on host machine (in order to launch app on this profile, You have to prepare database in psql, credentials are stored in application-test.properties), allows run the app locally like ```local```
 
 #### prod
 takes advantage of Docker and PostgreSQL container - if You going for containers make sure this is active profile.
