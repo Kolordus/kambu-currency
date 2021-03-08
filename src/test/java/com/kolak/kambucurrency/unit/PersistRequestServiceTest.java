@@ -1,7 +1,8 @@
-package com.kolak.kambucurrency.service;
+package com.kolak.kambucurrency.unit;
 
 import com.kolak.kambucurrency.model.PersistedRequest;
 import com.kolak.kambucurrency.repository.PersistedRequestRepository;
+import com.kolak.kambucurrency.service.PersistRequestService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

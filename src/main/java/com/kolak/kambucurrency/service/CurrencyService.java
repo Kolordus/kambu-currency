@@ -47,12 +47,13 @@ public class CurrencyService {
 
     public double convert(Double amount, String base, String desired) {
         if (amount <= 0) {
-            AmountMustBePositiveException exception = new AmountMustBePositiveException();
+            AmountMustBePositiveException exception = new AmountMustBePositiveException("Amount must be a positive number");
             persistRequestService.saveRequestWithError(exception.getMessage());
             throw exception;
         }
 
         LinkedList<String> invokedExternalApiUrls = new LinkedList<>();
+
         double baseRate = getPlnRate(base, invokedExternalApiUrls);
         double desiredBase = getPlnRate(desired, invokedExternalApiUrls);
         double converted = formatDouble((baseRate / desiredBase) * amount);
@@ -79,6 +80,7 @@ public class CurrencyService {
         persistRequestService.saveRequest(base.toUpperCase(), rates, invokedExternalApiUrls);
 
         return rates;
+
     }
 
     private Map<String, Double> getCurrencyRating(String base, Map<String, Double> rates, List<String> invokedExternalApiUrls) {
@@ -95,7 +97,7 @@ public class CurrencyService {
 
     private double getPlnRate(String base, List<String> invokedExternalApiUrls) {
         if (repositoryDoesntContainCurrency(base)) {
-            CurrencyNotSupportedException exception = new CurrencyNotSupportedException(base);
+            CurrencyNotSupportedException exception = new CurrencyNotSupportedException(base, "is not supported currency");
             persistRequestService.saveRequestWithError(exception.getMessage());
             throw exception;
         }

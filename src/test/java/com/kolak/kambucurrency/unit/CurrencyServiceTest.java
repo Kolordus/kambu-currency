@@ -1,4 +1,4 @@
-package com.kolak.kambucurrency.service;
+package com.kolak.kambucurrency.unit;
 
 import com.kolak.kambucurrency.exception.AmountMustBePositiveException;
 import com.kolak.kambucurrency.exception.CurrencyNotSupportedException;
@@ -6,6 +6,8 @@ import com.kolak.kambucurrency.model.Currency;
 import com.kolak.kambucurrency.model.nbpapi.CurrencyDetails;
 import com.kolak.kambucurrency.model.nbpapi.Rate;
 import com.kolak.kambucurrency.repository.CurrencyRepository;
+import com.kolak.kambucurrency.service.CurrencyService;
+import com.kolak.kambucurrency.service.PersistRequestService;
 import org.assertj.core.util.Lists;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
@@ -33,7 +35,8 @@ class CurrencyServiceTest {
 
     @Mock RestTemplate restTemplate;
 
-    @Mock PersistRequestService persistRequestService;
+    @Mock
+    PersistRequestService persistRequestService;
 
 
     @InjectMocks
@@ -85,10 +88,11 @@ class CurrencyServiceTest {
 
     @Test()
     public void shouldThrowAmountMustBePositiveException() {
+        // given
         double amount = 0;
         // then
 
-        Assert.assertThrows(AmountMustBePositiveException.class,
+        Assertions.assertThrows(AmountMustBePositiveException.class,
                 () -> currencyService.convert(amount, "EUR", "AUD"));
 
     }
@@ -98,7 +102,7 @@ class CurrencyServiceTest {
         double amount = -1;
         // then
 
-        Assert.assertThrows(AmountMustBePositiveException.class,
+        Assertions.assertThrows(AmountMustBePositiveException.class,
                 () -> currencyService.convert(amount, "EUR", "AUD"));
 
     }

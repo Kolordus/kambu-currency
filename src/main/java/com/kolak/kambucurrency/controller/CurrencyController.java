@@ -32,8 +32,8 @@ public class CurrencyController {
 
     @GetMapping("/convert")
     public ResponseEntity<Double> convertCurrency(@RequestParam(defaultValue = "1") Double amount,
-                                  @RequestParam(defaultValue = "PLN") String base,
-                                  @RequestParam(defaultValue = "EUR") String desired) {
+                                                  @RequestParam(defaultValue = "PLN") String base,
+                                                  @RequestParam(defaultValue = "EUR") String desired) {
         return ResponseEntity.ok(currencyService.convert(amount, base, desired));
     }
 
